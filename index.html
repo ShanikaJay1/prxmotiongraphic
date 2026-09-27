@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRX Vault Promo</title>
+<style>
+/* ---- Fonts (self-hosted so frame export is deterministic) ---------------- */
+@font-face { font-family: 'Manrope'; font-weight: 400; src: url(assets/fonts/manrope-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Manrope'; font-weight: 700; src: url(assets/fonts/manrope-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Manrope'; font-weight: 800; src: url(assets/fonts/manrope-latin-800-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 400; src: url(assets/fonts/inter-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 500; src: url(assets/fonts/inter-latin-500-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Momo Trust Display'; font-weight: 400; src: url(assets/fonts/momo-trust-display-latin-400-normal.woff2) format('woff2'); }
+
+/* ---- PRX tokens (from the PRX design system) ----------------------------- */
+:root {
+  --dark-1: #120f24; --dark-2: #1c1833; --dark-3: #272243; --dark-5: #413b5e;
+  --primary: #753fe4; --secondary: #df9bff; --success: #01d37f;
+  --ink: #ffffff; --ink-strong: rgba(255,255,255,0.9); --ink-muted: rgba(255,255,255,0.75);
+  --on-primary: #f5f5f5;
+  --category-pink: #e257e4; --category-violet: #aa5de7; --category-coral: #da674a; --category-tan: #e6b070;
+  --font-sans: 'Manrope', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-display: 'Momo Trust Display', 'Manrope', system-ui, sans-serif;
+}
+
+html, body { margin: 0; background: #000; }
+body { display: grid; place-items: center; min-height: 100vh; overflow: hidden; }
+
+/* 1080x1920 stage; scaled to fit the window in preview, 1:1 in export */
+#stage {
+  position: relative; width: 1080px; height: 1920px; overflow: hidden;
+  background: var(--dark-1); color: var(--ink); font-family: var(--font-body);
+  transform-origin: center center;
+}
+.abs { position: absolute; }
+.layer { position: absolute; inset: 0; }
+[data-anim] { will-change: transform, opacity, filter; opacity: 0; }
+
+/* Background */
+#bg-grad { inset: 0; background: url(assets/brand/bg-gradient.svg) center / cover no-repeat; }
+#bg-glow {
+  width: 1400px; height: 1400px; left: -160px; top: 260px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(117,63,228,0.35), rgba(117,63,228,0));
+}
+
+/* Type */
+.eyebrow { font-family: var(--font-sans); font-weight: 700; font-size: 30px; letter-spacing: 6px; color: var(--secondary); text-transform: uppercase; }
+.h1 { font-family: var(--font-sans); font-weight: 800; font-size: 96px; line-height: 1.08; letter-spacing: -2px; margin: 0; }
+.h2 { font-family: var(--font-sans); font-weight: 700; font-size: 72px; line-height: 1.12; letter-spacing: -1.44px; margin: 0; }
+.accent { font-family: var(--font-display); font-weight: 400; color: var(--category-tan); letter-spacing: 0; }
+.sub { font-family: var(--font-body); font-size: 38px; line-height: 1.4; color: var(--ink-muted); margin: 0; }
+.center { left: 0; right: 0; text-align: center; }
+.pad { left: 90px; right: 90px; }
+
+/* Phone frame around real app screens */
+.phone {
+  width: 600px; height: 1180px; left: 240px; top: 600px;
+  border-radius: 72px; overflow: hidden; background: var(--dark-2);
+  box-shadow: 0 0 0 3px var(--dark-5), 0 60px 120px rgba(0,0,0,0.55), 0 0 160px rgba(117,63,228,0.25);
+}
+.phone img { position: absolute; left: 0; top: 0; width: 100%; display: block; }
+
+/* 3D product assets */
+.obj { width: 300px; height: 300px; }
+.obj img { width: 100%; height: 100%; object-fit: contain; }
+
+/* Offer card: PRX OfferCard component, scaled 2x for 1080 canvas */
+#offer-track { left: 0; top: 700px; height: 760px; width: 1080px; }
+.offer {
+  position: absolute; top: 0; width: 640px; box-sizing: border-box;
+  background: var(--dark-2); border-radius: 80px; padding: 40px;
+  display: flex; flex-direction: column; gap: 20px; font-family: var(--font-body);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.45);
+}
+.offer-image { position: relative; aspect-ratio: 410 / 238; border-radius: 40px; overflow: hidden; background: #fff; }
+.offer-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.offer-tags { position: absolute; right: 20px; top: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.tag { font-size: 28px; color: var(--ink); border-radius: 20px; padding: 10px 22px; }
+.tag-primary { background: rgba(117,63,228,0.5); border: 2px solid var(--primary); }
+.tag-secondary { background: rgba(223,155,255,0.5); border: 2px solid var(--secondary); }
+.offer-category { margin: 10px 0 0; font-size: 28px; color: var(--ink-muted); }
+.offer-merchant { margin: 0; font-family: var(--font-sans); font-weight: 700; font-size: 36px; color: var(--ink); }
+.offer-cta {
+  margin-top: 16px; background: var(--primary); color: var(--ink); border-radius: 40px;
+  font-family: var(--font-sans); font-size: 30px; text-align: center; padding: 30px 0;
+}
+
+/* Category chips */
+#chips { top: 1560px; display: flex; justify-content: center; gap: 20px; }
+.chip {
+  font-family: var(--font-sans); font-size: 32px; color: var(--ink);
+  padding: 20px 36px; border-radius: 40px; border: 2px solid;
+}
+.chip-violet { background: rgba(170,93,231,0.1); border-color: var(--category-violet); }
+.chip-coral  { background: rgba(218,103,74,0.1); border-color: var(--category-coral); }
+.chip-pink   { background: rgba(226,87,228,0.1); border-color: var(--category-pink); }
+
+/* Wallet total overlay: counts up once cashback is confirmed */
+#s4-total {
+  position: absolute; left: 60px; right: 60px; top: 452px; height: 140px;
+  background: var(--dark-2); color: var(--success);
+  font-family: var(--font-sans); font-weight: 700; font-size: 128px; line-height: 140px;
+  text-align: center; letter-spacing: -2px;
+}
+
+/* Confirmation notice */
+#toast {
+  left: 150px; width: 780px; top: 1560px; box-sizing: border-box;
+  background: var(--dark-2); border: 2px solid var(--dark-5); border-radius: 40px;
+  padding: 34px 40px; display: flex; align-items: center; gap: 30px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+}
+#toast .tick {
+  flex: none; width: 84px; height: 84px; border-radius: 50%;
+  background: rgba(1,211,127,0.15); border: 2px solid var(--success);
+  display: grid; place-items: center;
+}
+#toast .tick svg { width: 44px; height: 44px; }
+#toast .meta { flex: 1; }
+#toast .who { font-family: var(--font-sans); font-weight: 700; font-size: 36px; margin: 0; }
+#toast .what { font-size: 28px; color: var(--ink-muted); margin: 6px 0 0; }
+#toast .amt { font-family: var(--font-sans); font-weight: 800; font-size: 52px; color: var(--success); }
+
+/* No-friction list */
+.nolist { font-family: var(--font-sans); font-weight: 800; font-size: 110px; letter-spacing: -2px; line-height: 1; }
+.nolist .x { color: var(--ink-muted); font-weight: 400; }
+
+/* End card */
+#end-lockup { width: 760px; left: 160px; top: 520px; }
+#end-lockup img { width: 100%; display: block; }
+#end-cta {
+  left: 50%; top: 1500px; margin-left: -330px; width: 660px; box-sizing: border-box;
+  background: var(--primary); color: var(--on-primary); border-radius: 30px;
+  font-family: var(--font-sans); font-size: 40px; text-align: center; padding: 40px 0;
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- Background -->
+  <div class="layer" id="bg">
+    <div class="abs" id="bg-grad" data-anim></div>
+    <div class="abs" id="bg-glow" data-anim></div>
+  </div>
+
+  <!-- S1 · Hook -->
+  <div class="abs" id="s1-mark" data-anim style="width:360px;left:360px;top:500px"><img src="assets/brand/mark.png" alt="" style="width:100%;display:block"></div>
+  <p class="abs h1 center" id="s1-l1" data-anim style="top:940px">Cashback,</p>
+  <p class="abs h1 center" id="s1-l2" data-anim style="top:1044px">minus the</p>
+  <p class="abs h1 center" id="s1-l3" data-anim style="top:1148px"><span class="accent">extra steps.</span></p>
+
+  <!-- S2 · Link once -->
+  <div class="abs eyebrow pad" id="s2-eye" data-anim style="top:190px">Step 01</div>
+  <p class="abs h2 pad" id="s2-h" data-anim style="top:250px">Link your card <span class="accent">once.</span></p>
+  <p class="abs sub pad" id="s2-sub" data-anim style="top:440px">One-time setup. Nothing to do at checkout.</p>
+  <div class="abs phone" id="s2-phone" data-anim><img id="s2-img" src="assets/ui/cards.jpg" alt=""></div>
+  <div class="abs obj" id="s2-card" data-anim style="left:640px;top:520px;width:400px;height:400px"><img src="assets/3d/payment-card-1.png" alt=""></div>
+
+  <!-- S3 · Shop as usual -->
+  <div class="abs eyebrow pad" id="s3-eye" data-anim style="top:190px">Step 02</div>
+  <p class="abs h2 pad" id="s3-h" data-anim style="top:250px">Shop like you <span class="accent">always do.</span></p>
+  <p class="abs sub pad" id="s3-sub" data-anim style="top:440px">Online or in-store, at 1,500+ places.</p>
+  <div class="abs obj" id="s3-o1" data-anim style="left:-30px;top:1640px;width:260px;height:260px"><img src="assets/3d/sneakers.png" alt=""></div>
+  <div class="abs obj" id="s3-o2" data-anim style="left:840px;top:560px;width:240px;height:240px"><img src="assets/3d/handbag.png" alt=""></div>
+  <div class="abs" id="offer-track">
+    <div class="offer" id="of1" data-anim>
+      <div class="offer-image"><img src="assets/merchants/new-balance.svg" alt=""><div class="offer-tags"><span class="tag tag-secondary">Instore</span><span class="tag tag-primary">Online</span></div></div>
+      <p class="offer-category">Sports &amp; Fitness</p><p class="offer-merchant">New Balance</p>
+      <div class="offer-cta">Get cashback</div>
+    </div>
+    <div class="offer" id="of2" data-anim>
+      <div class="offer-image"><img src="assets/merchants/swarovski.svg" alt=""><div class="offer-tags"><span class="tag tag-primary">Online</span></div></div>
+      <p class="offer-category">Fashion</p><p class="offer-merchant">Swarovski</p>
+      <div class="offer-cta">Get cashback</div>
+    </div>
+    <div class="offer" id="of3" data-anim>
+      <div class="offer-image"><img src="assets/merchants/princess-polly.svg" alt=""><div class="offer-tags"><span class="tag tag-primary">Online</span></div></div>
+      <p class="offer-category">Fashion</p><p class="offer-merchant">Princess Polly</p>
+      <div class="offer-cta">Get cashback</div>
+    </div>
+    <div class="offer" id="of4" data-anim>
+      <div class="offer-image"><img src="assets/merchants/nike.svg" alt=""><div class="offer-tags"><span class="tag tag-primary">Online</span></div></div>
+      <p class="offer-category">Sports &amp; Fitness</p><p class="offer-merchant">Nike</p>
+      <div class="offer-cta">Get cashback</div>
+    </div>
+  </div>
+  <div class="abs center" id="chips">
+    <span class="chip chip-violet" id="c1" data-anim>Fashion</span>
+    <span class="chip chip-coral" id="c2" data-anim>Food &amp; Drink</span>
+    <span class="chip chip-pink" id="c3" data-anim>Home</span>
+  </div>
+
+  <!-- S4 · Confirmed -->
+  <div class="abs eyebrow pad" id="s4-eye" data-anim style="top:190px">Step 03</div>
+  <p class="abs h2 pad" id="s4-h" data-anim style="top:250px">Cashback, <span class="accent">confirmed.</span></p>
+  <p class="abs sub pad" id="s4-sub" data-anim style="top:440px">Matched to your card transaction. Tracked in your wallet.</p>
+  <div class="abs phone" id="s4-phone" data-anim><img id="s4-img" src="assets/ui/wallet.jpg" alt=""><div id="s4-total">$0.00</div></div>
+  <div class="abs" id="toast" data-anim>
+    <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#01d37f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path id="tick-path" d="M5 12.5l4.5 4.5L19 7.5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
+    <div class="meta"><p class="who">New Balance</p><p class="what">Cashback confirmed</p></div>
+    <div class="amt" id="toast-amt">+$0.00</div>
+  </div>
+
+  <!-- S5 · No friction -->
+  <div class="abs pad nolist" id="n1" data-anim style="top:620px"><span class="x">No</span> codes.</div>
+  <div class="abs pad nolist" id="n2" data-anim style="top:770px"><span class="x">No</span> receipts.</div>
+  <div class="abs pad nolist" id="n3" data-anim style="top:920px"><span class="x">No</span> gimmicks.</div>
+  <p class="abs h2 pad" id="n4" data-anim style="top:1160px">Just the card<br><span class="accent">you already use.</span></p>
+
+  <!-- S6 · End card -->
+  <div class="abs" id="end-lockup" data-anim><img src="assets/brand/lockup.png" alt="PRX Vault"></div>
+  <p class="abs sub center" id="end-line" data-anim style="top:1060px;color:var(--ink-strong);font-size:42px">Link once. Shop as usual.<br>Get your cashback confirmed.</p>
+  <div class="abs" id="end-cta" data-anim>Download PRX Vault</div>
+</div>
+
+<script>
+/* =========================================================================
+   TIMING CONSTANTS: all values from prx-motion.css (seconds).
+   PX scales the token travel distances (authored for app UI) to the
+   1080px video canvas, about 2x a phone's CSS width.
+   ========================================================================= */
+const EASE = {
+  enter:  [0.16, 1, 0.3, 1],
+  exit:   [0.7, 0, 0.84, 0],
+  move:   [0.76, 0, 0.24, 1],
+  settle: [0.25, 1, 0.5, 1],
+  reveal: [0.86, 0, 0.07, 1],
+  drift:  [0.37, 0, 0.63, 1],
+};
+const DUR = { micro: 0.2, fast: 0.4, base: 0.7, slow: 1.1, hero: 1.6 };
+const STAGGER = { tight: 0.04, base: 0.08, wide: 0.14 };
+const HOLD = { short: 0.3, base: 0.8, long: 1.5 };
+const PX = 2;
+const TRAVEL = { sm: 12 * PX, md: 32 * PX, lg: 72 * PX };
+const SCALE_FROM = 0.96;
+const BLUR_FROM = 8;
+const EXIT_RATIO = 0.6;
+
+/* Scene start times */
+const S1 = 0.0, S2 = 4.0, S3 = 10.0, S4 = 15.8, S5 = 21.6, S6 = 25.0;
+const TOTAL = 29.0;
+const FPS = 30;
+
+/* ---- cubic-bezier solver ------------------------------------------------- */
+function bezier([x1, y1, x2, y2]) {
+  const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+  const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  const sx = t => ((ax * t + bx) * t + cx) * t;
+  const sy = t => ((ay * t + by) * t + cy) * t;
+  const dx = t => (3 * ax * t + 2 * bx) * t + cx;
+  return x => {
+    if (x <= 0) return 0; if (x >= 1) return 1;
+    let t = x;
+    for (let i = 0; i < 8; i++) { const e = sx(t) - x, d = dx(t); if (Math.abs(e) < 1e-6) break; if (Math.abs(d) < 1e-6) break; t -= e / d; }
+    let lo = 0, hi = 1;
+    if (Math.abs(sx(t) - x) > 1e-5) { t = x; while (hi - lo > 1e-6) { if (sx(t) < x) lo = t; else hi = t; t = (lo + hi) / 2; } }
+    return sy(t);
+  };
+}
+const E = Object.fromEntries(Object.entries(EASE).map(([k, v]) => [k, bezier(v)]));
+const prog = (t, start, dur, ease) => ease(Math.min(1, Math.max(0, (t - start) / dur)));
+const lerp = (a, b, p) => a + (b - a) * p;
+
+/* ---- element helpers ----------------------------------------------------- */
+const $ = id => document.getElementById(id);
+function set(el, { o = 1, x = 0, y = 0, s = 1, b = 0, extra = '' }) {
+  el.style.opacity = o.toFixed(4);
+  el.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${s.toFixed(4)}) ${extra}`;
+  el.style.filter = b > 0.01 ? `blur(${b.toFixed(2)}px)` : 'none';
+}
+/* Enter at `a` (duration `d`, curve, travel, optional blur), exit at `z`
+   with ease-exit at 60% of the entrance duration. */
+function beat(el, t, a, z, { d = DUR.base, ease = E.enter, dy = TRAVEL.md, dx = 0, blur = false, scale = true, extra = '' } = {}) {
+  const p = prog(t, a, d, ease);
+  const q = z == null ? 0 : prog(t, z, d * EXIT_RATIO, E.exit);
+  set(el, {
+    o: p * (1 - q),
+    x: (1 - p) * dx - q * dx * 0.5,
+    y: (1 - p) * dy - q * dy * 0.5,
+    s: scale ? lerp(SCALE_FROM, 1, p) * lerp(1, SCALE_FROM, q) : 1,
+    b: blur ? (1 - p) * BLUR_FROM * PX : 0,
+    extra,
+  });
+  return { p, q };
+}
+const text = (el, t, a, z, o = {}) => beat(el, t, a, z, { d: DUR.fast, ease: E.settle, dy: TRAVEL.sm, ...o });
+
+/* ---- the timeline: pure function of t, seekable ------------------------- */
+function render(t) {
+  /* Background: ambient drift, always on */
+  set($('bg-grad'), { o: lerp(0.35, 0.8, prog(t, 0, DUR.hero, E.drift)) * (1 - 0.35 * prog(t, S5 - DUR.base, DUR.hero, E.drift)) + 0.35 * prog(t, S6, DUR.hero, E.drift) });
+  const drift = Math.sin((t / TOTAL) * Math.PI * 2);
+  set($('bg-glow'), { o: 1, x: drift * 120, y: Math.cos((t / TOTAL) * Math.PI * 2) * 80 - 40, s: 1 + 0.06 * drift });
+
+  /* S1 · Hook: one focal element at a time */
+  const s1z = S2 - DUR.base * EXIT_RATIO - 0.1;
+  beat($('s1-mark'), t, S1 + 0.2, s1z, { d: DUR.hero, dy: TRAVEL.lg, blur: true });
+  text($('s1-l1'), t, S1 + 1.0, s1z);
+  text($('s1-l2'), t, S1 + 1.0 + STAGGER.wide, s1z);
+  text($('s1-l3'), t, S1 + 1.0 + STAGGER.wide * 2 + HOLD.short, s1z);
+
+  /* S2 · Link your card once */
+  const s2z = S3 - DUR.base * EXIT_RATIO - 0.1;
+  text($('s2-eye'), t, S2, s2z);
+  text($('s2-h'), t, S2 + STAGGER.base, s2z);
+  text($('s2-sub'), t, S2 + STAGGER.base * 2 + DUR.fast, s2z);
+  beat($('s2-phone'), t, S2 + 0.5, s2z, { d: DUR.slow, dy: TRAVEL.lg });
+  // 3D card arrives, holds, then glides into the "Add Card" button and hands off
+  {
+    const a = S2 + 1.3, mv = a + DUR.slow + HOLD.base;
+    const p = prog(t, a, DUR.slow, E.enter);
+    const m = prog(t, mv, DUR.hero, E.move);
+    const fade = prog(t, mv + DUR.hero - DUR.base, DUR.base * EXIT_RATIO, E.exit);
+    const bob = Math.sin((t - a) * 1.4) * 10 * (1 - m);
+    set($('s2-card'), {
+      o: p * (1 - fade),
+      x: lerp(TRAVEL.lg, 0, p) + lerp(0, -470, m),
+      y: lerp(TRAVEL.md, 0, p) + bob + lerp(0, 255, m),
+      s: lerp(SCALE_FROM, 1, p) * lerp(1, 0.55, m),
+      b: (1 - p) * BLUR_FROM,
+      extra: `rotate(${lerp(-6, 0, p) + lerp(0, -8, m)}deg)`,
+    });
+    // after the hand-off, the screen scrolls to the linked-card list
+    const sc = prog(t, mv + DUR.hero, DUR.hero, E.move);
+    $('s2-img').style.transform = `translateY(${lerp(0, -240, sc).toFixed(2)}px)`;
+  }
+
+  /* S3 · Shop like you always do */
+  const s3z = S4 - DUR.base * EXIT_RATIO - 0.1;
+  text($('s3-eye'), t, S3, s3z);
+  text($('s3-h'), t, S3 + STAGGER.base, s3z);
+  text($('s3-sub'), t, S3 + STAGGER.base * 2 + DUR.fast, s3z);
+  // Offer carousel: cards cascade in, then the track steps merchant to merchant
+  {
+    const CARD = 640, GAP = 40, step = CARD + GAP;
+    const a = S3 + 0.6;
+    const hops = [a + DUR.slow + HOLD.base, a + DUR.slow + HOLD.base + DUR.slow + HOLD.base, a + DUR.slow + HOLD.base + 2 * (DUR.slow + HOLD.base)];
+    const pos = hops.reduce((acc, h) => acc + prog(t, h, DUR.slow, E.move), 0);
+    ['of1', 'of2', 'of3', 'of4'].forEach((id, i) => {
+      const el = $(id);
+      const baseX = (1080 - CARD) / 2 + i * step - pos * step;
+      const focus = 1 - Math.min(1, Math.abs(i - pos));
+      const { p, q } = beat(el, t, a + i * STAGGER.wide, s3z, { d: DUR.slow, dy: TRAVEL.md, dx: TRAVEL.md });
+      el.style.left = baseX + 'px';
+      el.style.opacity = (p * (1 - q) * lerp(0.35, 1, focus)).toFixed(4);
+      el.style.transform += ` scale(${lerp(0.9, 1, focus).toFixed(4)})`;
+    });
+  }
+  ['c1', 'c2', 'c3'].forEach((id, i) => text($(id), t, S3 + 1.6 + i * STAGGER.base, s3z, { d: DUR.fast }));
+  beat($('s3-o1'), t, S3 + 1.2, s3z, { d: DUR.slow, dy: TRAVEL.md, extra: `rotate(${Math.sin(t * 0.9) * 3}deg)` });
+  beat($('s3-o2'), t, S3 + 1.2 + STAGGER.wide, s3z, { d: DUR.slow, dy: TRAVEL.md, extra: `rotate(${Math.cos(t * 0.8) * 3}deg)` });
+
+  /* S4 · Cashback, confirmed */
+  const s4z = S5 - DUR.base * EXIT_RATIO - 0.1;
+  text($('s4-eye'), t, S4, s4z);
+  text($('s4-h'), t, S4 + STAGGER.base, s4z);
+  text($('s4-sub'), t, S4 + STAGGER.base * 2 + DUR.fast, s4z);
+  beat($('s4-phone'), t, S4 + 0.5, s4z, { d: DUR.slow, dy: TRAVEL.lg });
+  {
+    const a = S4 + 0.5 + DUR.slow + HOLD.base;
+    beat($('toast'), t, a, s4z, { d: DUR.base, dy: TRAVEL.md });
+    const tick = prog(t, a + DUR.base * 0.5, DUR.base, E.reveal);
+    $('tick-path').setAttribute('stroke-dashoffset', (1 - tick).toFixed(4));
+    const amt = 6 * prog(t, a + DUR.base * 0.5, DUR.slow, E.reveal);
+    $('toast-amt').textContent = '+$' + amt.toFixed(2);
+    const tot = 6 * prog(t, a + DUR.base + HOLD.base, DUR.slow, E.reveal);
+    $('s4-total').textContent = '$' + tot.toFixed(2);
+  }
+
+  /* S5 · No codes. No receipts. No gimmicks. */
+  const s5z = S6 - DUR.base * EXIT_RATIO - 0.1;
+  ['n1', 'n2', 'n3'].forEach((id, i) => beat($(id), t, S5 + i * (STAGGER.wide + HOLD.short), s5z, { d: DUR.base, dy: TRAVEL.md }));
+  text($('n4'), t, S5 + 3 * (STAGGER.wide + HOLD.short) + HOLD.short, s5z, { d: DUR.base });
+
+  /* S6 · End card */
+  beat($('end-lockup'), t, S6, null, { d: DUR.hero, dy: TRAVEL.lg, blur: true });
+  text($('end-line'), t, S6 + DUR.base + STAGGER.wide, null, { d: DUR.base });
+  beat($('end-cta'), t, S6 + DUR.base + STAGGER.wide * 2 + HOLD.short, null, { d: DUR.base, dy: TRAVEL.md });
+}
+
+/* ---- playback / export hooks -------------------------------------------- */
+window.PRX_TIMELINE = { TOTAL, FPS, render };
+window.seek = t => render(t);
+
+function fit() {
+  if (new URLSearchParams(location.search).has('export')) return;
+  const s = Math.min(innerWidth / 1080, innerHeight / 1920);
+  $('stage').style.transform = `scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+if (!new URLSearchParams(location.search).has('export')) {
+  let t0 = null;
+  const loop = now => { if (t0 == null) t0 = now; render(((now - t0) / 1000) % (TOTAL + 1)); requestAnimationFrame(loop); };
+  document.fonts.ready.then(() => requestAnimationFrame(loop));
+} else {
+  render(0);
+}
+</script>
+</body>
+</html>
