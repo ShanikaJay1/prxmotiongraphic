@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRX Brand Scroll</title>
+<style>
+/* ---- Fonts: Manrope + Momo Trust Display only (brand-rules §4) ----------- */
+@font-face { font-family: 'Manrope'; font-weight: 400; src: url(assets/fonts/manrope-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Manrope'; font-weight: 700; src: url(assets/fonts/manrope-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Manrope'; font-weight: 800; src: url(assets/fonts/manrope-latin-800-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Momo Trust Display'; font-weight: 400; src: url(assets/fonts/momo-trust-display-latin-400-normal.woff2) format('woff2'); }
+
+/* ---- PRX tokens (from the PRX design system) ----------------------------- */
+:root {
+  --dark-1: #120f24; --dark-2: #1c1833; --dark-3: #272243; --dark-4: #332d51; --dark-5: #413b5e;
+  --primary: #753fe4; --secondary: #df9bff; --fawn: #e6b070;
+  --ink: #ffffff; --ink-strong: rgba(255,255,255,0.9); --ink-muted: rgba(255,255,255,0.75); --ink-faint: rgba(255,255,255,0.5);
+  --on-primary: #f5f5f5;
+  --font-sans: 'Manrope', system-ui, sans-serif;
+  --font-display: 'Momo Trust Display', 'Manrope', system-ui, sans-serif;
+}
+
+html, body { margin: 0; background: #000; }
+body { display: grid; place-items: center; min-height: 100vh; overflow: hidden; }
+
+/* 1080x1920 stage; scaled to fit the window in preview, 1:1 in export */
+#stage {
+  position: relative; width: 1080px; height: 1920px; overflow: hidden;
+  background: var(--dark-1); color: var(--ink); font-family: var(--font-sans);
+  transform-origin: center center;
+}
+.abs { position: absolute; }
+[data-anim] { will-change: transform, opacity, filter; opacity: 0; }
+
+/* Background: the one brand gradient, Violet -> Dark 1 */
+#bg-grad { inset: 0; background: url(assets/brand/bg-gradient.svg) center / cover no-repeat; }
+
+/* Type. Text-safe box is x 90-850, so centred copy centres on x 470 */
+.safe { left: 90px; width: 760px; }
+.center { text-align: center; }
+.hook { font-weight: 800; font-size: 104px; line-height: 1.05; letter-spacing: -2.5px; margin: 0; }
+.head { font-weight: 800; font-size: 64px; line-height: 1.1; letter-spacing: -1.4px; margin: 0; }
+.accent { font-family: var(--font-display); font-weight: 400; color: var(--fawn); letter-spacing: 0; }
+.sub { font-weight: 400; font-size: 38px; line-height: 1.35; color: var(--ink-muted); margin: 0; }
+
+/* ---- The app screen (flat product UI, no device frame: asset-context-guide, Context 4) ----
+   Authored at the app's own 390px mobile width, scaled up to 660px on the canvas. */
+#phone {
+  left: 140px; top: 450px; width: 660px; height: 1220px;
+  border-radius: 64px; overflow: hidden; background: var(--dark-1);
+  box-shadow: 0 0 0 3px var(--dark-5), 0 60px 140px rgba(0,0,0,0.6);
+}
+#screen { position: absolute; left: 0; top: 0; width: 390px; height: 721px; transform-origin: 0 0; transform: scale(1.6923); }
+#topbar { position: absolute; left: 15px; right: 15px; top: 16px; height: 44px; display: flex; gap: 10px; align-items: center; z-index: 3; }
+#topbar .mark { width: 44px; height: 44px; }
+#topbar .search { flex: 1; height: 44px; border-radius: 20px; background: var(--dark-2); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; box-sizing: border-box; font-size: 14px; color: var(--ink-muted); }
+#topbar .search svg { width: 16px; height: 16px; }
+#topbar .country { width: 70px; height: 44px; border-radius: 20px; background: var(--dark-2); display: grid; place-items: center; font-size: 14px; }
+#feedhead { position: absolute; left: 0; right: 0; top: 0; height: 168px; background: var(--dark-1); z-index: 2; }
+#feedhead h2 { position: absolute; left: 15px; top: 76px; margin: 0; font-weight: 700; font-size: 26px; letter-spacing: -0.3px; }
+#chips { position: absolute; left: 15px; top: 120px; display: flex; gap: 10px; white-space: nowrap; }
+.chip { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px 0 8px; border-radius: 20px; border: 1px solid var(--dark-5); background: var(--dark-2); font-size: 13px; color: var(--ink); box-sizing: border-box; }
+.chip img { width: 24px; height: 24px; }
+.chip.on { border-color: var(--primary); background: rgba(117,63,228,0.5); }
+#feedwrap { position: absolute; left: 0; right: 0; top: 168px; bottom: 0; overflow: hidden; }
+#feed { position: absolute; left: 15px; right: 15px; top: 6px; }
+
+/* Offer tile: matches the PRX home feed's "Our Offers" tile */
+.tile { position: absolute; left: 0; right: 0; height: 330px; background: var(--dark-2); border-radius: 30px; padding: 14px; box-sizing: border-box; }
+.tile .banner { position: relative; width: 100%; aspect-ratio: 400 / 240; border-radius: 16px; overflow: hidden; }
+.tile .banner img { width: 100%; height: 100%; display: block; }
+.tile .tags { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.tag { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--ink); border-radius: 8px; padding: 3px 7px; }
+.tag img { width: 11px; height: 11px; }
+.tag-online { background: rgba(117,63,228,0.5); border: 1px solid var(--primary); }
+.tag-instore { background: rgba(223,155,255,0.5); border: 1px solid var(--secondary); }
+.tile .cat { margin: 12px 0 0 4px; font-size: 11px; color: var(--ink-muted); }
+.tile .name { margin: 2px 0 0 4px; font-weight: 700; font-size: 14px; }
+.tile .ctas { display: flex; gap: 8px; margin-top: 12px; }
+.cta { flex: 1; height: 40px; border-radius: 15px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; letter-spacing: 0.3px; box-sizing: border-box; }
+.cta img { width: 14px; height: 14px; }
+.cta-online { background: var(--primary); color: var(--on-primary); }
+.cta-instore { border: 1px solid var(--primary); color: var(--ink); }
+
+/* Feed fades out above the platform caption band (y > 1440 on the canvas) */
+#fade { position: absolute; left: 0; right: 0; top: 560px; bottom: 0; z-index: 4;
+  background: linear-gradient(to bottom, rgba(18,15,36,0), rgba(18,15,36,1) 52%); }
+#bottombar { position: absolute; left: 71px; bottom: 14px; width: 248px; z-index: 5; }
+
+/* Touch indicator */
+#touch { width: 120px; height: 120px; border-radius: 50%; margin: -60px 0 0 -60px;
+  background: rgba(255,255,255,0.22); box-shadow: 0 0 0 3px rgba(255,255,255,0.5); z-index: 10; }
+
+/* ---- Brand wall --------------------------------------------------------- */
+#wall { left: 90px; top: 460px; width: 760px; height: 1220px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 120px, #000 900px, transparent 1100px);
+          mask-image: linear-gradient(to bottom, transparent 0, #000 120px, #000 900px, transparent 1100px); }
+.col { position: absolute; top: 0; width: 172px; }
+.col img { position: absolute; left: 0; width: 172px; height: 103px; border-radius: 16px; display: block; }
+
+/* Hook: merchant banners framing the opening line (never in the rail zone, x>=850 & y>=1152) */
+#hooktiles { inset: 0; }
+#hooktiles img { position: absolute; width: 230px; height: 138px; border-radius: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.45); }
+
+/* ---- How it works ------------------------------------------------------- */
+.step { left: 90px; width: 760px; display: flex; gap: 28px; align-items: flex-start; }
+.step .n { flex: none; width: 92px; height: 92px; border-radius: 30px; background: var(--primary); color: var(--on-primary);
+  display: grid; place-items: center; font-weight: 800; font-size: 40px; margin-top: 6px; }
+.step p { margin: 0; font-weight: 800; font-size: 68px; line-height: 1.08; letter-spacing: -1.5px; }
+#card3d { width: 340px; height: 340px; }
+#card3d img { width: 100%; height: 100%; object-fit: contain; }
+
+/* ---- End card ----------------------------------------------------------- */
+#end-lockup { width: 480px; left: 230px; top: 300px; }
+#end-lockup img { width: 100%; display: block; }
+#end-cta { left: 170px; width: 600px; top: 1010px; height: 124px; border-radius: 30px; background: var(--primary); color: var(--on-primary);
+  display: grid; place-items: center; font-weight: 800; font-size: 46px; letter-spacing: -0.5px; }
+#strip { left: 90px; top: 1210px; width: 760px; height: 112px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 90px, #000 670px, transparent 760px);
+          mask-image: linear-gradient(to right, transparent 0, #000 90px, #000 670px, transparent 760px); }
+#strip-track { position: absolute; left: 0; top: 0; height: 112px; }
+#strip-track img { position: absolute; top: 0; width: 186px; height: 112px; border-radius: 16px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="abs" id="bg-grad" data-anim></div>
+
+  <!-- S1 · Hook (frame 0 is the cover: both lines are on screen from the first frame) -->
+  <div class="abs" id="hooktiles"></div>
+  <div class="abs safe center" id="hook" data-anim style="top:640px">
+    <p class="hook">You already<br>shop here.</p>
+    <p class="hook" style="margin-top:36px;font-size:84px;letter-spacing:-1.8px">Where's your<br><span class="accent">cashback?</span></p>
+  </div>
+
+  <!-- S2 · Header lines above the app screen -->
+  <p class="abs safe center head" id="h1" data-anim style="top:282px">Your go-to brands.<br>Now with <span class="accent">cashback.</span></p>
+  <p class="abs safe center head" id="h2" data-anim style="top:282px">Big names.<br>Real <span class="accent">cashback.</span></p>
+  <p class="abs safe center head" id="h3" data-anim style="top:282px">Fashion. Sport. Beauty.<br>All in <span class="accent">one app.</span></p>
+
+  <!-- S2 · The app's home feed, scrolling -->
+  <div class="abs" id="phone" data-anim>
+    <div id="screen">
+      <div id="feedhead">
+        <div id="topbar">
+          <img class="mark" src="assets/brand/mark.png" alt="">
+          <div class="search">Search<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg></div>
+          <div class="country">AU</div>
+        </div>
+        <h2>Our Offers</h2>
+        <div id="chips"></div>
+      </div>
+      <div id="feedwrap"><div id="feed"></div></div>
+      <div id="fade"></div>
+      <img id="bottombar" src="assets/ui/bottom-bar.svg" alt="">
+    </div>
+  </div>
+  <div class="abs" id="touch" data-anim></div>
+
+  <!-- S3 · Brand wall -->
+  <div class="abs" id="wall" data-anim></div>
+
+  <!-- S4 · How it works -->
+  <div class="abs step" id="st1" data-anim style="top:470px"><div class="n">1</div><p>Sign up and<br>link your card.</p></div>
+  <div class="abs step" id="st2" data-anim style="top:760px"><div class="n">2</div><p>Shop like you<br>always do.</p></div>
+  <div class="abs step" id="st3" data-anim style="top:1050px"><div class="n">3</div><p>Get <span class="accent">cashback.</span></p></div>
+  <div class="abs" id="card3d" data-anim style="left:640px;top:250px"><img src="assets/3d/payment-card-1.png" alt=""></div>
+
+  <!-- S5 · End card -->
+  <div class="abs" id="end-lockup" data-anim><img src="assets/brand/lockup.png" alt="PRX Vault"></div>
+  <p class="abs safe center hook" id="end-h" data-anim style="top:620px;font-size:96px">Start <span class="accent">earning.</span></p>
+  <p class="abs safe center sub" id="end-sub" data-anim style="top:780px">Cashback at the brands<br>you already love.</p>
+  <div class="abs" id="end-cta" data-anim>Sign up now</div>
+  <div class="abs" id="strip" data-anim><div id="strip-track"></div></div>
+</div>
+
+<script>
+/* =========================================================================
+   CONTENT
+   Brands come from the design system's Merchant Banners. JD Sports is left
+   out: its banner file has no image data.
+   `earn` values marked SAMPLE are placeholders: swap in live offer values
+   before publishing (legal-and-claims). Unmarked values are from the app's
+   own home-feed export.
+   ========================================================================= */
+const BRANDS = [
+  { file: 'nike',           name: 'Nike AU',          cat: 'Sports & Fitness', online: '~$5', sample: true },
+  { file: 'new-balance',    name: 'New Balance',      cat: 'Sports & Fitness', online: '~$6', instore: '~$6' },
+  { file: 'reebok',         name: 'Reebok',           cat: 'Sports & Fitness', online: '~$4', sample: true },
+  { file: 'brooks-running', name: 'Brooks Running',   cat: 'Sports & Fitness', online: '~$5', sample: true },
+  { file: 'vans',           name: 'Vans Australia',   cat: 'Sports & Fitness', online: '~$4', sample: true },
+  { file: 'platypus',       name: 'Platypus',         cat: 'Sports & Fitness', online: '~$4', sample: true },
+  { file: 'everlast',       name: 'Everlast',         cat: 'Sports & Fitness', online: '~$3', sample: true },
+  { file: 'princess-polly', name: 'Princess Polly',   cat: 'Fashion',          online: '~$4' },
+  { file: 'asos',           name: 'ASOS',             cat: 'Fashion',          online: '~$4', sample: true },
+  { file: 'cotton-on',      name: 'Cotton On',        cat: 'Fashion',          online: '~$3', sample: true },
+  { file: 'supre',          name: 'Supré',            cat: 'Fashion',          online: '~$3', sample: true },
+  { file: 'superdry',       name: 'Superdry',         cat: 'Fashion',          online: '~$5', sample: true },
+  { file: 'tommy-hilfiger', name: 'Tommy Hilfiger',   cat: 'Fashion',          online: '~$8', sample: true },
+  { file: 'hugo-boss',      name: 'HUGO BOSS',        cat: 'Fashion',          online: '~$9', sample: true },
+  { file: 'rm-williams',    name: 'R.M. Williams',    cat: 'Fashion',          online: '~$12', sample: true },
+  { file: 'windsor-smith',  name: 'Windsor Smith',    cat: 'Fashion',          online: '~$5', sample: true },
+  { file: 'rayban',         name: 'Ray-Ban',          cat: 'Fashion',          online: '~$8', sample: true },
+  { file: 'swarovski',      name: 'Swarovski',        cat: 'Fashion',          online: '~$4' },
+  { file: 'myer',           name: 'Myer',             cat: 'Fashion',          online: '~$5', sample: true },
+  { file: 'bondi-sands',    name: 'Bondi Sands',      cat: 'Beauty',           online: '~$2', sample: true },
+];
+const CHIPS = [
+  { cat: 'Sports & Fitness', icon: 'sports-fitness' },
+  { cat: 'Fashion', icon: 'fashion' },
+  { cat: 'Beauty', icon: 'beauty' },
+  { cat: 'Food & Drink', icon: 'food-drink' },
+  { cat: 'Health', icon: 'health' },
+  { cat: 'Home', icon: 'home' },
+];
+
+/* =========================================================================
+   TIMING: easing, durations and stagger from prx-motion.css (seconds).
+   ========================================================================= */
+const EASE = {
+  enter:  [0.16, 1, 0.3, 1],
+  exit:   [0.7, 0, 0.84, 0],
+  move:   [0.76, 0, 0.24, 1],
+  settle: [0.25, 1, 0.5, 1],
+  reveal: [0.86, 0, 0.07, 1],
+  drift:  [0.37, 0, 0.63, 1],
+};
+const DUR = { micro: 0.2, fast: 0.4, base: 0.7, slow: 1.1, hero: 1.6 };
+const STAGGER = { tight: 0.04, base: 0.08, wide: 0.14 };
+const HOLD = { short: 0.3, base: 0.8, long: 1.5 };
+const PX = 2;
+const TRAVEL = { sm: 12 * PX, md: 32 * PX, lg: 72 * PX };
+const SCALE_FROM = 0.96;
+const BLUR_FROM = 8;
+const EXIT_RATIO = 0.6;
+
+/* Scene start times */
+const S1 = 0.0, S2 = 1.95, S3 = 10.9, S4 = 14.2, S5 = 17.4;
+const TOTAL = 21.6;
+const FPS = 30;
+
+/* Feed scroll: each flick lands with tile `to` at the top of the feed.
+   Flicks use ease-enter (fast start, long soft landing), which is how a
+   real momentum scroll decelerates. They speed up as the reel goes on. */
+const PITCH = 346;                 // tile height 330 + 16 gap, in screen px
+const FLICKS = [
+  { at: 3.6, to: 1,  d: DUR.slow },
+  { at: 5.0, to: 3,  d: DUR.slow },
+  { at: 6.3, to: 7,  d: DUR.hero },
+  { at: 8.0, to: 12, d: DUR.hero },
+  { at: 9.3, to: 18, d: DUR.slow },
+];
+const HOOK_TILES = [            // [brand index, x, y, rotation]: placed around the hook copy
+  [0, 70, 300, -6], [7, 380, 250, 3], [12, 700, 320, 7],
+  [1, 60, 1260, 5], [17, 360, 1330, -4], [19, 640, 1250, -7],
+];
+const H1_AT = 2.7, H2_AT = 6.3, H3_AT = S3 + 0.3;
+const CTA_TAP = S5 + 2.6;
+
+/* ---- cubic-bezier solver ------------------------------------------------- */
+function bezier([x1, y1, x2, y2]) {
+  const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+  const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  const sx = t => ((ax * t + bx) * t + cx) * t;
+  const sy = t => ((ay * t + by) * t + cy) * t;
+  const dx = t => (3 * ax * t + 2 * bx) * t + cx;
+  return x => {
+    if (x <= 0) return 0; if (x >= 1) return 1;
+    let t = x;
+    for (let i = 0; i < 8; i++) { const e = sx(t) - x, d = dx(t); if (Math.abs(e) < 1e-6) break; if (Math.abs(d) < 1e-6) break; t -= e / d; }
+    let lo = 0, hi = 1;
+    if (Math.abs(sx(t) - x) > 1e-5) { t = x; while (hi - lo > 1e-6) { if (sx(t) < x) lo = t; else hi = t; t = (lo + hi) / 2; } }
+    return sy(t);
+  };
+}
+const E = Object.fromEntries(Object.entries(EASE).map(([k, v]) => [k, bezier(v)]));
+const prog = (t, start, dur, ease) => ease(Math.min(1, Math.max(0, (t - start) / dur)));
+const lerp = (a, b, p) => a + (b - a) * p;
+
+/* ---- element helpers ----------------------------------------------------- */
+const $ = id => document.getElementById(id);
+function set(el, { o = 1, x = 0, y = 0, s = 1, b = 0, extra = '' }) {
+  el.style.opacity = o.toFixed(4);
+  el.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${s.toFixed(4)}) ${extra}`;
+  el.style.filter = b > 0.01 ? `blur(${b.toFixed(2)}px)` : 'none';
+}
+function beat(el, t, a, z, { d = DUR.base, ease = E.enter, dy = TRAVEL.md, dx = 0, blur = false, scale = true, extra = '' } = {}) {
+  const p = prog(t, a, d, ease);
+  const q = z == null ? 0 : prog(t, z, d * EXIT_RATIO, E.exit);
+  set(el, {
+    o: p * (1 - q),
+    x: (1 - p) * dx - q * dx * 0.5,
+    y: (1 - p) * dy - q * dy * 0.5,
+    s: scale ? lerp(SCALE_FROM, 1, p) * lerp(1, SCALE_FROM, q) : 1,
+    b: blur ? (1 - p) * BLUR_FROM * PX : 0,
+    extra,
+  });
+  return { p, q };
+}
+const text = (el, t, a, z, o = {}) => beat(el, t, a, z, { d: DUR.fast, ease: E.settle, dy: TRAVEL.sm, ...o });
+const exitAt = next => next - DUR.base * EXIT_RATIO - 0.1;
+
+/* ---- build the DOM from content ----------------------------------------- */
+const GLOBE = 'assets/icons/globe.svg', STORE = 'assets/icons/storefront.svg';
+$('chips').innerHTML = CHIPS.map(c => `<div class="chip" data-cat="${c.cat}"><img src="assets/icons/${c.icon}.png" alt="">${c.cat}</div>`).join('');
+$('feed').innerHTML = BRANDS.map((b, i) => `
+  <div class="tile" style="top:${i * PITCH}px">
+    <div class="banner"><img src="assets/merchants/${b.file}.svg" alt="">
+      <div class="tags">${b.instore ? `<span class="tag tag-instore"><img src="${STORE}" alt="">Instore</span>` : ''}<span class="tag tag-online"><img src="${GLOBE}" alt="">Online</span></div>
+    </div>
+    <p class="cat">${b.cat}</p><p class="name">${b.name}</p>
+    <div class="ctas">
+      <div class="cta cta-online"><img src="${GLOBE}" alt="">EARN ${b.online}</div>
+      ${b.instore ? `<div class="cta cta-instore"><img src="${STORE}" alt="">Earn ${b.instore}</div>` : ''}
+    </div>
+  </div>`).join('');
+{
+  // Four columns, each starting at a different brand so neighbours differ
+  const TILE = 103, GAP = 20, COL_X = [0, 196, 392, 588];
+  $('wall').innerHTML = COL_X.map((x, c) => {
+    const list = [...BRANDS.slice(c * 5), ...BRANDS.slice(0, c * 5)];
+    const imgs = [...list, ...list].map((b, i) => `<img src="assets/merchants/${b.file}.svg" style="top:${i * (TILE + GAP)}px" alt="">`).join('');
+    return `<div class="col" id="col${c}" style="left:${x}px">${imgs}</div>`;
+  }).join('');
+  window.WALL_LOOP = BRANDS.length * (TILE + GAP);
+  $('strip-track').innerHTML = [...BRANDS, ...BRANDS].map((b, i) => `<img src="assets/merchants/${b.file}.svg" style="left:${i * 206}px" alt="">`).join('');
+  window.STRIP_LOOP = BRANDS.length * 206;
+}
+$('hooktiles').innerHTML = HOOK_TILES.map(([i, x, y]) => `<img src="assets/merchants/${BRANDS[i].file}.svg" style="left:${x}px;top:${y}px" alt="">`).join('');
+const hookTileEls = [...document.querySelectorAll('#hooktiles img')];
+const chipEls = [...document.querySelectorAll('.chip')];
+
+/* Scroll position of the feed, in tiles, as a pure function of t */
+function feedPos(t) {
+  let pos = 0, from = 0;
+  for (const f of FLICKS) { pos += (f.to - from) * prog(t, f.at, f.d, E.enter); from = f.to; }
+  return pos;
+}
+
+/* ---- the timeline: pure function of t, seekable ------------------------- */
+function render(t) {
+  /* Background: the brand gradient breathes slightly; never off */
+  set($('bg-grad'), { o: 0.55 + 0.25 * prog(t, 0, DUR.hero, E.drift) - 0.25 * prog(t, S4 - 0.4, DUR.hero, E.drift) + 0.3 * prog(t, S5, DUR.hero, E.drift) });
+
+  /* S1 · Hook: on screen at frame 0, slow push-in, then clears for the app */
+  {
+    const q = prog(t, S2 - 0.35, DUR.base * EXIT_RATIO, E.exit);
+    set($('hook'), { o: 1 - q, y: -q * TRAVEL.md, s: lerp(1, 1.03, prog(t, 0, S2, E.drift)) * lerp(1, SCALE_FROM, q) });
+    hookTileEls.forEach((el, i) => {
+      const [, , y0, r] = HOOK_TILES[i];
+      const out = prog(t, S2 - 0.45 + i * STAGGER.tight, DUR.base * EXIT_RATIO, E.exit);
+      const away = (y0 < 960 ? -1 : 1) * TRAVEL.lg * 2 * out;
+      const bob = Math.sin(t * 1.6 + i * 1.3) * 8;
+      set(el, { o: 1 - out, y: bob + away, s: lerp(1, 1.02, prog(t, 0, S2, E.drift)), extra: `rotate(${(r + Math.sin(t + i) * 1.5).toFixed(2)}deg)` });
+    });
+  }
+
+  /* S2 · Header lines */
+  text($('h1'), t, H1_AT, exitAt(H2_AT), { d: DUR.base });
+  text($('h2'), t, H2_AT, exitAt(H3_AT), { d: DUR.base });
+  text($('h3'), t, H3_AT, exitAt(S4), { d: DUR.base });
+
+  /* S2 · App screen rises, scrolls, then steps back for the wall */
+  {
+    const p = prog(t, S2, DUR.slow, E.enter);
+    const q = prog(t, S3 - 0.35, DUR.base * EXIT_RATIO, E.exit);   // fully gone as the wall arrives
+    set($('phone'), { o: p * (1 - q), y: (1 - p) * TRAVEL.lg * 3 - q * TRAVEL.md, s: lerp(SCALE_FROM, 1, p) * lerp(1, 0.9, q) });
+
+    const pos = feedPos(t);
+    const vel = Math.abs(pos - feedPos(t - 1 / FPS)) * PITCH * FPS;        // screen px per second
+    const feed = $('feed');
+    feed.style.transform = `translateY(${(-pos * PITCH).toFixed(2)}px)`;
+    feed.style.filter = vel > 300 ? `blur(${Math.min(3, (vel - 300) / 900).toFixed(2)}px)` : 'none';
+
+    // Active category follows the tile at the top of the feed; the chip row slides to keep it in view
+    const top = BRANDS[Math.min(BRANDS.length - 1, Math.round(pos))].cat;
+    let chipX = 0;
+    chipEls.forEach(el => {
+      el.classList.toggle('on', el.dataset.cat === top);
+      if (el.dataset.cat === top) chipX = Math.max(0, el.offsetLeft - 15 - 10);
+    });
+    // slide the row as the feed crosses into Fashion (driven by pos, so it stays seekable)
+    const cx = lerp(0, Math.min(chipX, 140), Math.min(1, Math.max(0, (pos - 6) / 1.5)));
+    $('chips').style.transform = `translateX(${(-cx).toFixed(2)}px)`;
+  }
+
+  /* Touch: a thumb press and swipe up before each flick */
+  {
+    let o = 0, y = 0, s = 1;
+    for (const f of FLICKS) {
+      const a = f.at - 0.25;
+      if (t < a - 0.1 || t > f.at + 0.45) continue;
+      const pin = prog(t, a, 0.2, E.settle);
+      const sw = prog(t, f.at - 0.05, 0.3, E.move);
+      const out = prog(t, f.at + 0.15, 0.25, E.exit);
+      o = pin * (1 - out); y = -sw * 300; s = lerp(1.15, 1, pin) * lerp(1, 0.9, sw);
+    }
+    const el = $('touch');
+    el.style.left = '520px'; el.style.top = '1260px';
+    set(el, { o, y, s });
+  }
+
+  /* S3 · Brand wall: columns slide in from opposite ends, then drift */
+  {
+    const p = prog(t, S3, DUR.slow, E.enter);
+    const q = prog(t, S4 - 0.35, DUR.base * EXIT_RATIO, E.exit);
+    set($('wall'), { o: p * (1 - q), s: lerp(1.04, 1, p) * lerp(1, SCALE_FROM, q) });
+    for (let c = 0; c < 4; c++) {
+      const dir = c % 2 ? 1 : -1;
+      const drift = (t - S3) * 110 * dir;
+      const enter = (1 - p) * 500 * -dir;
+      let y = (drift + enter - c * 60) % WALL_LOOP;
+      if (y > 0) y -= WALL_LOOP;
+      $('col' + c).style.transform = `translateY(${y.toFixed(2)}px)`;
+    }
+  }
+
+  /* S4 · How it works */
+  {
+    const z = exitAt(S5);
+    ['st1', 'st2', 'st3'].forEach((id, i) => beat($(id), t, S4 + 0.1 + i * (STAGGER.wide + HOLD.short + 0.25), z, { d: DUR.base, dx: TRAVEL.md, dy: 0 }));
+    beat($('card3d'), t, S4 + 0.3, z, { d: DUR.slow, dy: TRAVEL.md, blur: true, extra: `rotate(${(-8 + Math.sin(t * 1.3) * 3).toFixed(2)}deg)` });
+  }
+
+  /* S5 · End card */
+  beat($('end-lockup'), t, S5, null, { d: DUR.hero, dy: TRAVEL.lg, blur: true });
+  text($('end-h'), t, S5 + DUR.base, null, { d: DUR.base });
+  text($('end-sub'), t, S5 + DUR.base + STAGGER.wide + HOLD.short, null, { d: DUR.base });
+  {
+    const { p } = beat($('end-cta'), t, S5 + DUR.base + STAGGER.wide * 2 + HOLD.short * 2, null, { d: DUR.base, dy: TRAVEL.md });
+    // the thumb taps "Sign up now"
+    const press = prog(t, CTA_TAP, 0.12, E.settle) * (1 - prog(t, CTA_TAP + 0.12, 0.3, E.settle));
+    if (p >= 1) $('end-cta').style.transform = `scale(${(1 - 0.04 * press).toFixed(4)})`;
+    if (t > CTA_TAP - 0.4 && t < CTA_TAP + 0.8) {
+      const el = $('touch');
+      el.style.left = '540px'; el.style.top = '1080px';
+      const pin = prog(t, CTA_TAP - 0.3, 0.3, E.settle), out = prog(t, CTA_TAP + 0.25, 0.35, E.exit);
+      set(el, { o: pin * (1 - out), s: lerp(1.2, 1, pin) * (1 - 0.12 * press) });
+    }
+  }
+  {
+    const p = prog(t, S5 + DUR.base + STAGGER.wide * 3 + HOLD.short * 2, DUR.slow, E.enter);
+    set($('strip'), { o: p * 0.9, y: (1 - p) * TRAVEL.sm });
+    $('strip-track').style.transform = `translateX(${(-((t - S5) * 70) % STRIP_LOOP).toFixed(2)}px)`;
+  }
+}
+
+/* ---- playback / export hooks -------------------------------------------- */
+window.PRX_TIMELINE = { TOTAL, FPS, render, BRANDS, FLICKS, PITCH, S: { S1, S2, S3, S4, S5 } };
+window.seek = t => render(t);
+
+function fit() {
+  if (new URLSearchParams(location.search).has('export')) return;
+  const s = Math.min(innerWidth / 1080, innerHeight / 1920);
+  $('stage').style.transform = `scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+if (!new URLSearchParams(location.search).has('export')) {
+  let t0 = null;
+  const loop = now => { if (t0 == null) t0 = now; render(((now - t0) / 1000) % (TOTAL + 1)); requestAnimationFrame(loop); };
+  document.fonts.ready.then(() => requestAnimationFrame(loop));
+} else {
+  render(0);
+}
+</script>
+</body>
+</html>
