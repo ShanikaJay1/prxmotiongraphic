@@ -1,5 +1,7 @@
 # PRX Vault: Promo Motion Graphic
 
+> **New:** `remotion/` holds the 20s and 15s vertical social video, built in Remotion with hook variants for A/B testing. See [`remotion/README.md`](remotion/README.md).
+
 A 29-second, 1080×1920 promo for PRX Vault. It is built as a seekable HTML timeline using the PRX design system: its tokens, fonts, 3D assets, merchant banners and `prx-motion.css` easing and durations.
 
 - `index.html`: the animation. Open it in a browser to preview (it loops).

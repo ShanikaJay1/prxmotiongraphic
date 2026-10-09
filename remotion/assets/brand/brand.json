@@ -1,0 +1,24 @@
+{
+  "source": "PRX Vault Design System (tokens.json + brand-rules), synced 2026-09-17",
+  "colors": {
+    "primary": "#753FE4",
+    "accent": "#E6B070",
+    "background": "#120F24",
+    "surface": "#1C1833",
+    "surfaceRaised": "#272243",
+    "border": "#413B5E",
+    "secondary": "#DF9BFF",
+    "success": "#01D37F",
+    "fail": "#E44F19",
+    "text": "#FFFFFF",
+    "textMuted": "rgba(255,255,255,0.75)",
+    "light": "#F2EBFF"
+  },
+  "fonts": { "display": "Manrope", "body": "Manrope", "accent": "Momo Trust Display" },
+  "fontFiles": [
+    { "family": "Manrope", "weight": "400", "file": "fonts/manrope-latin-400-normal.woff2" },
+    { "family": "Manrope", "weight": "700", "file": "fonts/manrope-latin-700-normal.woff2" },
+    { "family": "Manrope", "weight": "800", "file": "fonts/manrope-latin-800-normal.woff2" },
+    { "family": "Momo Trust Display", "weight": "400", "file": "fonts/momo-trust-display-latin-400-normal.woff2" }
+  ]
+}
