@@ -14,7 +14,9 @@ export const BrandWall: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
   const layout = useLayout();
   const marquee = layout.brandWall === "marquee" || (layout.brandWall === "auto" && merchants.length > 12);
+  const column = layout.brandWall === "column";
   const headlineTop = marquee ? 360 : SAFE.text.y + 10;
+  const wallTopColumn = SAFE.text.y + 260;
   const wallTop = marquee ? 590 : SAFE.text.y + 230;
   const length = Math.min(duration, 180);
   return (
@@ -23,7 +25,7 @@ export const BrandWall: React.FC<{ duration: number }> = ({ duration }) => {
       <div style={{ position: "absolute", left: SAFE.text.x, top: headlineTop, width: SAFE.text.w }}>
         <KineticText text={copy.wall} frame={frame} startFrame={2} maxWidth={SAFE.text.w} maxHeight={220} minSize={80} maxSize={96} />
       </div>
-      <BrandGrid merchants={merchants} frame={frame} duration={length} top={wallTop} startFrame={6} />
+      <BrandGrid merchants={merchants} frame={frame} duration={length} top={column ? wallTopColumn : wallTop} startFrame={6} />
       {[0, 2, 4, 6].map((slot) => (
         <Sfx key={slot} name="pop" at={6 + slot * 3 + 4} volume={0.55} />
       ))}

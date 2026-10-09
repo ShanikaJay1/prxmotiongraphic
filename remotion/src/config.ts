@@ -110,8 +110,9 @@ export const layout = {
   // "floating": the app screen as a floating card (brand book: no device mockups).
   // "phone": the brief's phone frame.
   uiFrame: "floating" as "floating" | "phone",
+  // "column": one card per row, scrolling up like a feed (chosen in review).
   // "auto": grid for up to 12 merchants, two counter-scrolling rows above that.
-  brandWall: "auto" as "auto" | "grid" | "marquee",
+  brandWall: "column" as "column" | "auto" | "grid" | "marquee",
 };
 
 export const audio = {

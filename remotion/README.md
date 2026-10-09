@@ -2,7 +2,7 @@
 
 A 9:16 vertical video (1080 x 1920, 30 fps) for TikTok, Reels and Shorts. It comes as a 20 second master, a 15 second cutdown, and one 20 second file per hook for A/B testing.
 
-Built with Remotion 4 (React + TypeScript). Every animation is driven by the frame number, so rendering twice gives identical output.
+Built with Remotion 4 (React + TypeScript). Every animation is driven by the frame number: any single frame renders byte-identical every time. Full videos rendered twice match to over 50 dB PSNR (visually identical). They are not bit-identical, because Chrome rasterises frames across parallel tabs.
 
 ## Quick start
 
@@ -41,7 +41,8 @@ Everything lives in `src/config.ts`. You never need to touch a component.
 
 - Only list brands PRX has confirmed it may market. Delete a line to drop a brand everywhere.
 - Leave `cashback` empty unless the rate is confirmed. When it is set (for example `"Up to 8%"`), a badge appears on that brand's card. Nothing else in the video shows a rate.
-- With 12 merchants or fewer, the wall is a 3-column grid that cascades in and scrolls. With more than 12, it becomes two rows scrolling in opposite directions. Set `layout.brandWall` to `"grid"` or `"marquee"` to force either one.
+- The brand wall is a single column of cards that scrolls up like a feed (`layout.brandWall: "column"`, chosen in review). The card crossing the centre lifts. The scroll is capped at a readable speed, so the 20s cut shows about the first 10 brands and the 15s cut fewer: put the brands you most want seen first in the list.
+- Other wall layouts: `"grid"` (3 columns that cascade in and scroll), `"marquee"` (two rows scrolling in opposite directions), or `"auto"` (grid up to 12 merchants, marquee above that, as in the original brief).
 
 **Adding a hook variant.** Add a string to `hookVariants`. The next `npm run render` also writes `out/prx-vault-20s-hook-<n>.mp4`, where `n` is its position in the list, starting from 1. The hook sizes and wraps itself between 140 and 180 px, with at most two words per line.
 
@@ -98,7 +99,7 @@ In Studio, each scene is also its own composition under **Scenes**, with safe zo
 | 1 | 0 to 60 | Hook | Solid violet. Each word springs from 0.6 to 1.0 scale, 2 frames apart. Every word is on screen from frame 0, so the first frame works as a cover |
 | 2 | 60 to 120 | The turn | The question, then a receipt slides up. "$0 back" draws on, then is struck through |
 | 3 | 120 to 195 | Reveal | The mark pops in with one accent ring pulse, PRX and VAULT resolve beside it, then the value line |
-| 4 | 195 to 360 | Brand wall | Cards cascade in diagonally (3 frames apart), the wall scrolls, and three cards lift |
+| 4 | 195 to 360 | Brand wall | A single column of cards scrolls up like a feed. The card crossing the centre lifts |
 | 5 | 360 to 495 | How it works | The real web app UI. Three steps tick in. The example balance counts up in a callout labelled "Example" |
 | 6 | 495 to 600 | CTA | Lockup, CTA, URL button with a gentle pulse, disclaimer. The last 15 frames are completely still |
 
@@ -111,6 +112,7 @@ The PRX design system wins over the brief where they disagree. Each of these is 
 - **No overshoot.** The brand book bans bounce and overshoot, so the brief's spring (`damping 14, stiffness 120, mass 0.8`) runs with its overshoot clamped. Set `motion.allowOvershoot: true` for the brief's look.
 - **No phone mockup.** The brand book rules out device mockups, so the UI sits on a floating card. Set `layout.uiFrame: "phone"` for the brief's phone frame.
 - **No radial glow.** The only gradient the brand allows is linear Violet to Dark 1, so the reveal's "glow pulse" is a single expanding accent ring instead.
+- **Brand wall as one scrolling column**, not the brief's grid or two-row marquee (chosen in review).
 - **Stricter safe zones.** The design system's zones (top 270, bottom 480, left 90, right 230, and the lower-right rail) are stricter than the brief's on every edge, so meeting them meets both. Text is centred on the text-safe box (x 470), not the frame.
 - **Manrope, not Inter.** The brand book uses only Manrope and Momo Trust Display.
 - **Wordmark by line.** The logo is raster only, so the wordmark reveals line by line (PRX, then VAULT) rather than letter by letter.

@@ -69,6 +69,7 @@ const lines = [
   "",
   "- PRX logos are raster only (2013x1053 lockup, 1053x1053 mark). They are sharp at this video size, but a vector export is needed to animate the wordmark letter by letter. Until then the wordmark reveals line by line (PRX, then VAULT) from the supplied PNG.",
   "- JD Sports and Superdry are in the design system's Merchant Banners, but their SVGs reference an embedded image that is empty, so they render blank. Both are left out of `config.ts` until working files are supplied.",
+  "- The app screens are the design system's Home-Mobile and Wallet-Mobile exports, cropped to their top 804x1600 (the only part ever on screen) so Chrome decodes them quickly.",
   "- The app screens are the design system's template screens, so they show placeholder content (\"John Smith\", \"$XX.XX\"). The balance callout covers the \"$XX.XX\" with the labelled example figure from `config.ts`.",
   "",
 ];

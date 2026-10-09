@@ -79,6 +79,7 @@ if (mode === "videos" || mode === "all") {
       inputProps,
       codec: "h264",
       pixelFormat: "yuv420p",
+      colorSpace: "bt709", // limited-range yuv420p, tagged BT.709, as platforms expect
       audioCodec: "aac",
       enforceAudioTrack: true, // silent AAC track when there is no audio
       crf: 20,

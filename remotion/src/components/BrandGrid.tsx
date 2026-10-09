@@ -37,11 +37,58 @@ const fadeMask = (dir: "x" | "y", a: number, b: number, size: number, fade: numb
 };
 
 // The brand wall: a 3 column grid that cascades in then scrolls like a feed,
-// or (more than 12 merchants) two counter-scrolling marquee rows.
+// two counter-scrolling marquee rows, or a single column scrolling like a feed.
 export const BrandGrid: React.FC<Props> = (props) => {
   const layout = useLayout();
   const mode = layout.brandWall === "auto" ? (props.merchants.length > 12 ? "marquee" : "grid") : layout.brandWall;
+  if (mode === "column") return <Column {...props} />;
   return mode === "grid" ? <Grid {...props} /> : <Marquee {...props} />;
+};
+
+// One card per row. The feed eases up to speed, scrolls, and eases to a stop
+// with the last card centred. The card crossing the centre lifts.
+const Column: React.FC<Props> = ({ merchants, frame, duration, top, startFrame = 0 }) => {
+  const cardW = 520;
+  const gap = 30;
+  const cardH = Math.round(cardW * 0.08 + (cardW - Math.round(cardW * 0.04) * 2) * 0.6);
+  const pitch = cardH + gap;
+  const viewport = SAFE.text.y + SAFE.text.h - top;
+  const centre = viewport / 2;
+  const firstTop = centre - cardH / 2; // first card starts centred
+  const scrollFrom = startFrame + 14;
+  const scrollTo = Math.max(scrollFrom + 1, duration - 14);
+  const maxSpeed = 38; // px per frame at full speed, so logos stay readable
+  const distance = Math.min((merchants.length - 1) * pitch, maxSpeed * (scrollTo - scrollFrom) * 0.66);
+  const scroll = interpolate(frame, [scrollFrom, scrollTo], [0, distance], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.33, 0, 0.67, 1),
+  });
+  const left = SAFE.text.x + (SAFE.text.w - cardW) / 2;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top,
+        width: 1080,
+        overflow: "hidden",
+        ...fadeMask("y", 0, viewport, viewport, 90),
+      }}
+    >
+      {merchants.map((m, i) => {
+        const y = firstTop + i * pitch - scroll;
+        if (y > viewport + pitch || y < -2 * pitch) return null;
+        const lift = Math.max(0, 1 - Math.abs(y + cardH / 2 - centre) / pitch);
+        const slot = Math.max(0, Math.round((firstTop + i * pitch) / pitch));
+        return (
+          <div key={m.slug} style={{ position: "absolute", left, top: y, zIndex: lift > 0.5 ? 2 : 1, ...entrance(frame, startFrame + slot * CASCADE_STEP) }}>
+            <LogoCard merchant={m} width={cardW} lift={lift} />
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 const Grid: React.FC<Props> = ({ merchants, frame, duration, top, startFrame = 0 }) => {
