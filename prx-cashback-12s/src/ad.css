@@ -1,0 +1,112 @@
+/* Brand rules: Manrope and Momo Trust Display only. tokens.css still lists
+   Inter as --font-body; the brand book overrides it. */
+:root {
+  --font-body: var(--font-sans);
+}
+
+.stage {
+  background: var(--dark-1);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  overflow: hidden;
+}
+.abs { position: absolute; }
+
+/* Headlines: heading-lg and hero-md/hero-lg at the video scale (x2.5). */
+.headline {
+  position: absolute;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 70px;
+  line-height: 84px;
+  letter-spacing: -1.4px;
+  color: var(--ink);
+}
+.headline-line { display: block; white-space: nowrap; }
+.headline-line > span { display: inline-block; }
+.accent {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0;
+  font-size: 100px;
+  line-height: 120px;
+}
+.accent-hero { font-size: 120px; line-height: 144px; }
+.c-fail { color: var(--fail); }
+.c-tan { color: var(--category-tan); }
+.c-success { color: var(--success); }
+
+/* Merchant banners are third-party marks: shown as provided, never restyled. */
+.banner { display: block; width: 100%; height: 100%; }
+
+/* App-scale UI, mounted inside a zoom: 2.5 wrapper. */
+.zoom { zoom: 2.5; }
+
+.zero-tag {
+  box-sizing: border-box;
+  width: 80px; /* 200px on canvas */
+  height: 72px; /* matches the 180px banner row */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark-2);
+  border: 1px solid var(--fail);
+  border-radius: var(--radius-20);
+  color: var(--fail);
+  font: var(--text-subheading);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Receipt (placeholder): OfferCard surface + flat text, pending a formal
+   Receipt component in the design system. */
+.receipt.prx-offer {
+  width: 300px;
+  box-sizing: border-box;
+  gap: var(--space-10);
+}
+.receipt-item {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+}
+.receipt-logo {
+  flex: none;
+  width: 50px;
+  height: 30px;
+  border-radius: var(--radius-10);
+  overflow: hidden;
+}
+.receipt-text { flex: 1; display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.receipt-text .prx-offer-merchant { line-height: 1.2; }
+.receipt-amount {
+  font: var(--text-body-medium);
+  font-weight: 700;
+  color: var(--success);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.receipt-total-slot { height: 64px; margin-top: var(--space-5); }
+
+.total-pill {
+  box-sizing: border-box;
+  width: 260px;
+  height: 64px;
+  padding: 0 var(--space-15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--dark-3);
+  border-radius: var(--radius-20);
+}
+.total-label { font: var(--text-body-small); color: var(--ink-muted); }
+.total-amount {
+  font: var(--text-heading-lg);
+  letter-spacing: -0.56px;
+  color: var(--success);
+  font-variant-numeric: tabular-nums;
+}
+
+.cta .prx-btn { font: var(--text-button-large); white-space: nowrap; }

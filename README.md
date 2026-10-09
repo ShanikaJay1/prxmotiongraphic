@@ -1,5 +1,7 @@
 # PRX Vault: Promo Motion Graphic
 
+> **Also here: `prx-cashback-12s/`**, a 12-second, 9:16 paid-social ad ("Your last Princess Polly order paid you back $0.00") built in Remotion with the PRX design system and the paid-ad safe areas. The renders are in `prx-cashback-12s/out/`. Placeholders, QA results and open items are in `prx-cashback-12s/BUILD_NOTES.md`.
+
 A 29-second, 1080×1920 promo for PRX Vault. It is built as a seekable HTML timeline using the PRX design system: its tokens, fonts, 3D assets, merchant banners and `prx-motion.css` easing and durations.
 
 - `index.html`: the animation. Open it in a browser to preview (it loops).
