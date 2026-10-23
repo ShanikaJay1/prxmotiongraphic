@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roki Grappler Wraps Ad</title>
+<style>
+/* ---- Fonts (self-hosted so frame export is deterministic) ---------------- */
+@font-face { font-family: 'Druk Wide'; font-weight: 700; src: url(assets/fonts/DrukWide-Bold.ttf) format('truetype'); }
+@font-face { font-family: 'Anime Ace'; font-weight: 700; src: url(assets/fonts/AnimeAce-Bold.ttf) format('truetype'); }
+@font-face { font-family: 'Poppins'; font-weight: 400; src: url(assets/fonts/poppins-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Poppins'; font-weight: 700; src: url(assets/fonts/poppins-latin-700-normal.woff2) format('woff2'); }
+
+/* ---- Roki tokens (from the Roki design system) --------------------------- */
+:root {
+  --RokiRed: #8a0000; --signal-red: #d52828; --ink: #080808; --paper: #ffffff; --studio-grey: #e3e6e7;
+  --font-display: 'Druk Wide', 'Arial Black', sans-serif;
+  --font-comic: 'Anime Ace', 'Comic Sans MS', cursive;
+  --font-body: Poppins, 'Helvetica Neue', Arial, sans-serif;
+  --space-1: 16px; --space-2: 32px; --space-3: 60px; --space-4: 96px;
+  --border-frame: 3px; --border-panel: 8px;
+}
+
+html, body { margin: 0; background: #1a1a1a; }
+body { display: grid; place-items: center; min-height: 100vh; font-family: var(--font-body); }
+#stage { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--paper); }
+body:not(.export) #stage { transform-origin: center; }
+.layer, .scene { position: absolute; inset: 0; }
+.scene { visibility: hidden; }
+img { display: block; }
+[data-stamp] { visibility: hidden; transform-origin: left center; }
+
+/* paper + grain */
+#paper { z-index: 1; width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; opacity: .5; }
+.grain { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.grainA { mix-blend-mode: multiply; opacity: .14; }
+#grainB { z-index: 30; mix-blend-mode: multiply; opacity: .06; }
+#grainDark { z-index: 31; mix-blend-mode: screen; opacity: .08; visibility: hidden; }
+#shake { z-index: 5; }
+
+/* type */
+.head { position: absolute; left: var(--space-3); top: var(--space-4); margin: 0; font-family: var(--font-display); font-weight: 700;
+  line-height: .92; letter-spacing: -1px; color: var(--ink); filter: url(#roughH); }
+.head span { display: block; white-space: nowrap; width: max-content; }
+.accent { color: var(--RokiRed); }
+.kicker { position: absolute; font-family: var(--font-comic); font-weight: 700; font-size: 32px; line-height: 1.1; color: var(--ink); white-space: nowrap; filter: url(#roughS); }
+.body { position: absolute; font-family: var(--font-body); font-size: 34px; line-height: 1.3; font-weight: 400; color: var(--ink); white-space: nowrap; }
+.cta { position: absolute; font-family: var(--font-body); font-size: 34px; line-height: 1.1; font-weight: 700; letter-spacing: 1px; color: var(--paper); white-space: nowrap; }
+
+/* logos: fixed corners, never filtered */
+.logo { position: absolute; z-index: 20; visibility: hidden; }
+.wm { left: var(--space-3); bottom: var(--space-3); width: 210px; }
+.ch-br { right: var(--space-3); bottom: 66px; width: 190px; }
+.ch-tr { right: var(--space-3); top: var(--space-3); width: 190px; }
+
+/* manga panels */
+.panel { position: absolute; overflow: hidden; outline: var(--border-panel) solid var(--ink); outline-offset: 0; }
+.pfill { position: absolute; inset: 0; background-repeat: no-repeat; transform-origin: center; }
+.finish::after { content: ''; position: absolute; inset: 0; mix-blend-mode: multiply; opacity: .2;
+  background: radial-gradient(circle, var(--ink) 38%, transparent 40%) 0 0 / 5px 5px; }
+
+/* proof callouts */
+.callout { position: absolute; display: flex; align-items: center; gap: 20px; padding: 10px 28px 10px 22px; background: var(--paper);
+  border: var(--border-frame) solid var(--ink); }
+.callout b { font-family: var(--font-display); font-size: 64px; line-height: 1; font-weight: 700; }
+.callout i { font-style: normal; font-family: var(--font-comic); font-weight: 700; font-size: 30px; line-height: 1.1; }
+
+/* wipes */
+#wipe { z-index: 25; visibility: hidden; }
+.band { position: absolute; left: 0; height: 300px; width: 3400px; transform-origin: 0 50%; }
+.band .solid { position: absolute; left: 800px; width: 1800px; top: 0; bottom: 0; background: var(--ink); }
+.band .bhead, .band .btail { position: absolute; top: 0; width: 820px; height: 300px; background: var(--ink); filter: none;
+  -webkit-mask: url(assets/pack/brush/stroke_3.png) 0 0/100% 100% no-repeat; mask: url(assets/pack/brush/stroke_3.png) 0 0/100% 100% no-repeat; }
+.band .bhead { left: 2580px; }
+.band .btail { left: 0; transform: scaleX(-1); }
+
+/* preview HUD (never rendered) */
+#hud { position: fixed; left: 12px; bottom: 12px; color: #ddd; font: 13px/1.4 ui-monospace, monospace; }
+body.export #hud { display: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="1"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 0.55"/></feComponentTransfer>
+    </filter>
+    <filter id="roughH" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="roughS" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="roughB" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="9" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="outline" x="-20%" y="-20%" width="140%" height="140%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="10" result="d"/>
+      <feFlood flood-color="#ffffff"/><feComposite in2="d" operator="in" result="o"/>
+      <feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </svg>
+
+  <img id="paper" class="layer" alt="">
+
+  <div id="shake" class="layer">
+    <!-- S1 HOOK: manga strip + NO QUIT / NO FRAY / NO SLIP -->
+    <section id="s1" class="scene">
+      <div class="kicker" style="left:60px;top:96px" data-stamp="0">MADE FOR THE STRIKERS</div>
+      <div class="panel" id="jab" style="left:60px;top:168px;width:960px;height:420px">
+        <div class="pfill" style="background-image:url(assets/manga/manga-jab.png);background-size:cover;background-position:center"></div>
+      </div>
+      <svg class="grain grainA"><rect width="100%" height="100%" filter="url(#grain)"/></svg>
+      <h1 class="head" id="noLines" style="top:668px">
+        <span data-stamp="0.5">NO QUIT.</span>
+        <span data-stamp="1.0" style="margin-top:22px">NO FRAY.</span>
+        <span data-stamp="1.5" class="accent" style="margin-top:22px">NO SLIP.</span>
+      </h1>
+    </section>
+
+    <!-- S2 PRODUCT: burst + Tier A cut-out -->
+    <section id="s2" class="scene">
+      <canvas id="burst" width="1080" height="1350" class="layer" style="filter:url(#roughB)"></canvas>
+      <svg class="grain grainA"><rect width="100%" height="100%" filter="url(#grain)"/></svg>
+      <img id="product" src="assets/photos/grappler-cut-06.png" alt="The Grappler Hand Wraps"
+        style="position:absolute;width:820px;left:130px;top:556px;filter:url(#outline) drop-shadow(14px 14px 0 #080808);transform-origin:center">
+      <h1 class="head" id="s2head" data-stamp="3.0"><span>THE <em class="accent" style="font-style:normal">GRAPPLER</em></span><span>HAND WRAPS</span></h1>
+      <div class="body" style="left:60px;top:1104px" data-stamp="3.5">Cotton-elastic blend. Second-skin compression.</div>
+    </section>
+
+    <!-- S3 PROOF: panels + numbered callouts -->
+    <section id="s3" class="scene">
+      <h1 class="head" id="s3head"><span>BUILT FOR</span><span>HEAVY HANDS</span></h1>
+      <div class="panel" id="pA" style="left:60px;top:308px;width:592px;height:548px;clip-path:polygon(0 0,100% 0,calc(100% - 30px) 100%,0 100%);outline:none" data-stamp="5.5">
+        <div class="pfill finish" style="background-image:url(assets/photos/grappler-model-05.jpg);background-size:cover;background-position:50% 30%;filter:contrast(1.1) brightness(.95)"></div>
+      </div>
+      <div class="panel" id="pB" style="left:642px;top:308px;width:378px;height:548px;clip-path:polygon(30px 0,100% 0,100% 100%,0 100%);outline:none" data-stamp="5.667">
+        <div class="pfill" style="background-image:url(assets/photos/grappler-flat-01.jpg);background-size:cover;background-position:36% 50%"></div>
+      </div>
+      <svg id="pFrames" class="layer" style="pointer-events:none;visibility:hidden">
+        <g fill="none" stroke="#080808" stroke-width="8" stroke-linejoin="miter" filter="url(#roughS)">
+          <polygon id="fA" points="60,308 652,308 622,856 60,856"/>
+          <polygon id="fB" points="672,308 1020,308 1020,856 642,856"/>
+        </g>
+      </svg>
+      <div class="callout" style="left:60px;top:812px" data-stamp="6.5"><b>1</b><i>4.5M LENGTH</i></div>
+      <div class="callout" style="left:196px;top:936px" data-stamp="7.0"><b>2</b><i>REINFORCED THUMB LOOP</i></div>
+      <div class="callout" style="left:332px;top:1060px" data-stamp="7.5"><b>3</b><i>EXTRA-WIDE VELCRO</i></div>
+    </section>
+
+    <!-- S4 END CARD: dark, house-finish photo, CTA -->
+    <section id="s4" class="scene" style="background:var(--ink)">
+      <div id="s4photo" class="layer finish" style="background:url(assets/photos/grappler-model-07.jpg) 50% 0/1080px 1350px no-repeat;top:-260px;filter:contrast(1.15) brightness(.85);transform-origin:50% 45%"></div>
+      <div class="layer" style="top:760px;height:220px;background:var(--ink);-webkit-mask:url(assets/pack/torn/edge_2.png) 0 0/100% 100% no-repeat;mask:url(assets/pack/torn/edge_2.png) 0 0/100% 100% no-repeat"></div>
+      <div class="layer" style="top:978px;background:var(--ink)"></div>
+      <div class="kicker" style="left:60px;top:858px;color:var(--signal-red)" data-stamp="9.5">READY FOR ROUND ONE?</div>
+      <h1 class="head" id="s4head" style="top:916px;color:var(--paper)" data-stamp="10.0"><span>START YOUR</span><span>TRAINING ARC</span></h1>
+      <div class="body" style="left:60px;top:1092px;color:var(--paper);font-size:30px" data-stamp="10.5">The Grappler Hand Wraps. A$29.99.</div>
+      <div class="cta" style="left:60px;top:1150px" data-stamp="11.0">SHOP NOW</div>
+    </section>
+  </div>
+
+  <img class="logo wm" id="wmB" src="assets/logos/roki-wordmark-black.png" alt="ロキ roki">
+  <img class="logo ch-br" id="chB" src="assets/logos/choten-block-black.png" alt="頂点へ">
+  <img class="logo wm" id="wmW" src="assets/logos/roki-wordmark-white.png" alt="ロキ roki">
+  <img class="logo ch-tr" id="chW" src="assets/logos/choten-block-white.png" alt="頂点へ">
+
+  <div id="wipe" class="layer"></div>
+  <svg id="grainB" class="grain"><rect width="100%" height="100%" filter="url(#grain)"/></svg>
+  <svg id="grainDark" class="grain"><rect width="100%" height="100%" filter="url(#grain)" style="filter:url(#grain) invert(1)"/></svg>
+</div>
+<div id="hud"></div>
+
+<script>
+/* ---- Timeline (24 fps, 120 BPM: one beat = 0.5 s = 12 frames) ------------- */
+const FPS = 24, BPM = 120, BEAT = 60 / BPM;
+const S1 = 0, S2 = 2.5, S3 = 5.5, S4 = 9.0, TOTAL = 12.5;
+const WIPES = [S3, S4];                 // brush-band wipes centred on these cuts
+const HITS = [0.5, 1.0, 1.5, S2, 3.0];  // camera shake on the heavy stamps
+const FLASH = [S2];                     // 2-frame impact invert
+window.ROKI = { TOTAL, FPS, BPM, S1, S2, S3, S4 };
+
+const frame = t => Math.floor(t * FPS + 1e-6);
+const held = (t, n) => Math.floor(frame(t) / n);
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+const $ = s => document.querySelector(s);
+const scenes = [['#s1', S1, S2], ['#s2', S2, S3], ['#s3', S3, S4], ['#s4', S4, TOTAL + 1]].map(([s, a, b]) => [$(s), a, b]);
+const PAPERS = ['assets/pack/paper/cool_0.jpg', 'assets/pack/paper/cool_1.jpg', 'assets/pack/paper/cool_2.jpg'];
+const PAPER_ORDER = [0, 2, 1, 2, 0, 1];
+
+/* ---- Fit headlines by measurement (paper-grunge-motion 5.12) -------------- */
+function fit(el, maxW, maxH, min = 40, max = 240) {
+  let lo = min, hi = max;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; el.style.fontSize = m + 'px';
+    const w = Math.max(...[...el.children].map(c => c.scrollWidth));
+    (w <= maxW && el.scrollHeight <= maxH) ? lo = m : hi = m; }
+  el.style.fontSize = lo + 'px';
+}
+
+/* ---- Wipe bands ----------------------------------------------------------- */
+const wipe = $('#wipe');
+for (let i = 0; i < 8; i++) {
+  const b = document.createElement('div'); b.className = 'band';
+  b.style.top = (-90 + i * 200) + 'px';
+  b.innerHTML = '<div class="btail"></div><div class="solid"></div><div class="bhead"></div>';
+  wipe.appendChild(b);
+}
+const bands = [...wipe.children];
+
+/* ---- Spike burst (centre = product centre, capped off the type) ----------- */
+const bctx = $('#burst').getContext('2d');
+function drawBurst(seed, punch) {
+  const r = mulberry32(seed), cx = 540, cy = 762, R = 760 * punch, minY = 330, maxY = 1080, n = 30;
+  bctx.clearRect(0, 0, 1080, 1350); bctx.fillStyle = '#080808';
+  for (let k = 0; k < n; k++) {
+    const a = (k + r() * .5) / n * Math.PI * 2, w = (1.6 + r() * 2.6) * Math.PI / 180, s = Math.sin(a);
+    let len = R * (.5 + r() * .5);
+    if (s < 0) len = Math.min(len, (minY - cy) / s); else if (s > 0) len = Math.min(len, (maxY - cy) / s);
+    bctx.beginPath(); bctx.moveTo(cx + Math.cos(a - w * 6) * 40, cy + Math.sin(a - w * 6) * 40);
+    bctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
+    bctx.lineTo(cx + Math.cos(a + w * 6) * 40, cy + Math.sin(a + w * 6) * 40); bctx.fill();
+  }
+  bctx.beginPath(); bctx.arc(cx, cy, 120, 0, 7); bctx.fill();
+}
+
+/* ---- Stepped stamp entrance: scale 1.12 -> 1 over 3 frames + paper jolt ---- */
+const STAMP_S = [1.12, 1.06, 1.02], JOLT = [[7, -5], [-4, 3]];
+function stamp(el, ts, t) {
+  const k = frame(t) - frame(ts);
+  if (k < 0) { el.style.visibility = 'hidden'; return; }
+  el.style.visibility = 'inherit';
+  const s = k < 3 ? STAMP_S[k] : 1, j = k < 2 ? JOLT[k] : [0, 0];
+  el.style.transform = `translate(${j[0]}px,${j[1]}px) scale(${s})`;
+}
+
+/* ---- seek(t): everything is a pure function of t -------------------------- */
+const stamps = [...document.querySelectorAll('[data-stamp]')].map(el => [el, +el.dataset.stamp]);
+function seek(t) {
+  const f = frame(t);
+  const dark = t >= S4;
+
+  // scenes: hard cuts
+  for (const [el, a, b] of scenes) el.style.visibility = (t >= a && t < b) ? 'visible' : 'hidden';
+  $('#stage').style.background = dark ? 'var(--ink)' : 'var(--paper)';
+
+  // paper flicker: crumple state held 4 frames
+  const p = $('#paper'); p.style.visibility = dark ? 'hidden' : 'visible';
+  const src = PAPERS[PAPER_ORDER[held(t, 4) % PAPER_ORDER.length]];
+  if (!p.src.endsWith(src)) p.src = src;
+
+  // grain on twos, ink boil on fours
+  document.querySelector('#grain feTurbulence').setAttribute('seed', 1 + held(t, 2) % 40);
+  document.querySelector('#roughH feTurbulence').setAttribute('seed', 3 + held(t, 4) % 3);
+  document.querySelector('#roughS feTurbulence').setAttribute('seed', 5 + held(t, 4) % 3);
+  document.querySelector('#roughB feTurbulence').setAttribute('seed', 9 + held(t, 4) % 3);
+  $('#grainDark').style.visibility = dark ? 'visible' : 'hidden';
+
+  // stamps
+  for (const [el, ts] of stamps) stamp(el, ts, t);
+
+  // S1: stepped push-in inside the jab panel (4-frame holds)
+  const jab = $('#jab .pfill'), jh = Math.min(held(t, 4), 14);
+  jab.style.transform = `scale(${1 + jh * .006}) translateX(${-jh * 3}px)`;
+
+  // S2: burst throb (re-rolled on fours, punch on the beat), product held still
+  if (t >= S2 && t < S3) {
+    const sinceBeat = f - frame(S2 + Math.floor((t - S2) / BEAT) * BEAT);
+    drawBurst(100 + held(t, 4), sinceBeat < 2 ? 1.05 : 1);
+  }
+
+  // S3: frames cut in with their panels; stepped push-in on panel A
+  $('#pFrames').style.visibility = t >= S3 ? 'inherit' : 'hidden';
+  $('#fB').style.visibility = f >= frame(5.667) ? 'visible' : 'hidden';
+  const ph = Math.max(0, held(t - S3, 4));
+  $('#pA .pfill').style.transform = `scale(${1.02 + Math.min(ph, 20) * .004})`;
+
+  // S4: slow stepped push-in on the photo
+  const qh = Math.max(0, held(t - S4, 4));
+  $('#s4photo').style.transform = `scale(${1 + Math.min(qh, 30) * .0025})`;
+
+  // logos: black on paper (wordmark bottom-left, 頂点へ bottom-right); white on ink (頂点へ top-right)
+  $('#wmB').style.visibility = $('#chB').style.visibility = dark ? 'hidden' : 'visible';
+  $('#wmW').style.visibility = $('#chW').style.visibility = dark ? 'visible' : 'hidden';
+
+  // shake: random offset held per 2 frames, decays over 8 frames
+  let sx = 0, sy = 0;
+  HITS.forEach((h, i) => { const k = f - frame(h); if (k >= 0 && k < 8) {
+    const r = mulberry32(1000 + i * 31 + (k >> 1)), amp = 12 * (1 - k / 8);
+    sx += (r() * 2 - 1) * amp; sy += (r() * 2 - 1) * amp; } });
+  $('#shake').style.transform = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px)`;
+
+  // brush-band wipes: 6 held steps of 2 frames, fully covered on the cut frame
+  let showWipe = false;
+  for (const c of WIPES) {
+    const s = Math.floor((f - frame(c) + 6) / 2);   // step 0..6, step 3 = the cut
+    if (s >= 0 && s <= 6) {
+      showWipe = true;
+      bands.forEach((b, i) => {
+        const x = -3400 + 4480 * s / 6 + i * 40;
+        b.style.transform = `translateX(${x}px) rotate(-3deg)`;
+      });
+    }
+  }
+  wipe.style.visibility = showWipe ? 'visible' : 'hidden';
+
+  // impact flash: 2 frames of inverted colours
+  const flash = FLASH.some(h => f - frame(h) >= 0 && f - frame(h) < 2);
+  $('#stage').style.filter = flash ? 'invert(1)' : 'none';
+
+  $('#hud').textContent = `t ${t.toFixed(3)}s  f ${f}  beat ${(t / BEAT + 1).toFixed(2)}`;
+}
+window.seek = seek;
+
+/* ---- Boot ------------------------------------------------------------------ */
+const exportMode = location.search.includes('export');
+if (exportMode) document.body.classList.add('export');
+const imgs = [...PAPERS, 'assets/pack/brush/stroke_3.png', 'assets/pack/torn/edge_2.png', 'assets/manga/manga-jab.png',
+  'assets/photos/grappler-model-05.jpg', 'assets/photos/grappler-flat-01.jpg', 'assets/photos/grappler-model-07.jpg'];
+Promise.all([document.fonts.ready, ...imgs.map(u => new Promise(r => { const i = new Image(); i.onload = i.onerror = r; i.src = u; })),
+  ...[...document.images].map(i => i.complete ? 0 : new Promise(r => i.onload = i.onerror = r))]).then(() => {
+  // every scene shown while measuring
+  scenes.forEach(([el]) => el.style.visibility = 'visible');
+  fit($('#noLines'), 960, 520);
+  fit($('#s2head'), 960, 240);
+  fit($('#s3head'), 960, 200);
+  fit($('#s4head'), 960, 170);
+  seek(0);
+  window.ready = true;
+  if (!exportMode) play();
+});
+
+/* ---- Preview controls: Space play/pause, arrows step a frame, R replay ----- */
+let playing = false, t0 = 0, tNow = 0;
+function loop(now) { if (!playing) return; tNow = ((now - t0) / 1000) % TOTAL; seek(tNow); requestAnimationFrame(loop); }
+function play() { playing = true; t0 = performance.now() - tNow * 1000; requestAnimationFrame(loop); }
+addEventListener('keydown', e => {
+  if (e.code === 'Space') { playing ? (playing = false) : play(); e.preventDefault(); }
+  if (e.code === 'ArrowRight' || e.code === 'ArrowLeft') { playing = false; tNow = Math.max(0, Math.min(TOTAL, tNow + (e.code === 'ArrowRight' ? 1 : -1) / FPS)); seek(tNow); }
+  if (e.code === 'KeyR') { tNow = 0; play(); }
+});
+</script>
+</body>
+</html>
