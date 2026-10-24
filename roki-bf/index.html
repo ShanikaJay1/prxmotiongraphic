@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roki Black Friday Wraps</title>
+<style>
+/* ---- Fonts (self-hosted so frame export is deterministic) ---------------- */
+@font-face { font-family: 'Druk Wide'; font-weight: 700; src: url(assets/fonts/DrukWide-Bold.ttf) format('truetype'); }
+@font-face { font-family: 'Anime Ace'; font-weight: 700; src: url(assets/fonts/AnimeAce-Bold.ttf) format('truetype'); }
+@font-face { font-family: 'Poppins'; font-weight: 400; src: url(assets/fonts/poppins-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Poppins'; font-weight: 700; src: url(assets/fonts/poppins-latin-700-normal.woff2) format('woff2'); }
+
+/* ---- Roki tokens (from the Roki design system) --------------------------- */
+:root {
+  --RokiRed: #8a0000; --signal-red: #d52828; --promo-yellow: #ffea00; --ink: #080808; --paper: #ffffff;
+  --font-display: 'Druk Wide', 'Arial Black', sans-serif;
+  --font-comic: 'Anime Ace', 'Comic Sans MS', cursive;
+  --font-body: Poppins, 'Helvetica Neue', Arial, sans-serif;
+  --space-1: 16px; --space-2: 32px; --space-3: 60px; --space-4: 96px;
+  --border-frame: 3px; --border-panel: 8px;
+}
+
+html, body { margin: 0; background: #1a1a1a; }
+body { display: grid; place-items: center; min-height: 100vh; font-family: var(--font-body); }
+#stage { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--ink); }
+.layer, .scene { position: absolute; inset: 0; }
+.scene { visibility: hidden; }
+[data-stamp] { visibility: hidden; }
+
+/* paper + grain */
+#paper { z-index: 1; width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; opacity: .5; }
+.grain { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.grainA { mix-blend-mode: multiply; opacity: .14; }
+#grainB { z-index: 30; mix-blend-mode: multiply; opacity: .06; }
+#grainDark { z-index: 31; mix-blend-mode: screen; opacity: .08; }
+#shake { z-index: 5; }
+
+/* type */
+.head { position: absolute; margin: 0; font-family: var(--font-display); font-weight: 700; line-height: .92; letter-spacing: -1px;
+  color: var(--ink); filter: url(#roughH); }
+.head span { display: block; white-space: nowrap; width: max-content; }
+.center { left: 0; right: 0; text-align: center; }
+.center span { margin: 0 auto; }
+.tl { left: var(--space-3); top: var(--space-4); transform-origin: left center; }
+.accent { color: var(--RokiRed); }
+.offer { color: var(--promo-yellow); }
+.tag { position: absolute; left: 50%; padding: 10px 22px 8px; background: var(--signal-red); color: var(--paper);
+  font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: .5px; white-space: nowrap; }
+.body { position: absolute; font-family: var(--font-body); font-size: 30px; line-height: 1.3; color: var(--paper); white-space: nowrap; }
+.cta { position: absolute; font-family: var(--font-body); font-size: 34px; line-height: 1.1; font-weight: 700; letter-spacing: 1px; color: var(--paper); white-space: nowrap; }
+
+/* logos: fixed corners, never filtered */
+.logo { position: absolute; z-index: 20; visibility: hidden; }
+.wm { left: var(--space-3); bottom: var(--space-3); width: 210px; }
+.ch { right: var(--space-3); bottom: 66px; width: 190px; }
+
+/* catalogue panels */
+.panel { position: absolute; overflow: hidden; background: var(--ink); }
+.pfill { position: absolute; inset: 0; background-repeat: no-repeat; background-size: cover; transform-origin: center; }
+.name { position: absolute; left: 14px; bottom: 14px; padding: 6px 12px 4px; background: var(--paper); border: var(--border-frame) solid var(--ink);
+  font-family: var(--font-comic); font-weight: 700; font-size: 22px; line-height: 1.1; color: var(--ink); white-space: nowrap; }
+.frames { pointer-events: none; }
+.frames polygon { fill: none; stroke: var(--ink); stroke-width: 8; stroke-linejoin: miter; }
+
+/* deal callout */
+.deal { position: absolute; left: 50%; display: flex; align-items: center; gap: 18px; padding: 12px 28px 10px; background: var(--paper);
+  border: var(--border-frame) solid var(--ink); white-space: nowrap; }
+.deal b { font-family: var(--font-display); font-size: 46px; line-height: 1; }
+.deal i { font-style: normal; font-family: var(--font-comic); font-weight: 700; font-size: 30px; line-height: 1.1; }
+
+/* wipes */
+#wipe { z-index: 25; visibility: hidden; }
+.band { position: absolute; left: 0; height: 300px; width: 3400px; transform-origin: 0 50%; }
+.band .solid { position: absolute; left: 800px; width: 1800px; top: 0; bottom: 0; background: var(--ink); }
+.band .bhead, .band .btail { position: absolute; top: 0; width: 820px; height: 300px; background: var(--ink);
+  -webkit-mask: url(assets/pack/brush/stroke_3.png) 0 0/100% 100% no-repeat; mask: url(assets/pack/brush/stroke_3.png) 0 0/100% 100% no-repeat; }
+.band .bhead { left: 2580px; }
+.band .btail { left: 0; transform: scaleX(-1); }
+
+#hud { position: fixed; left: 12px; bottom: 12px; color: #ddd; font: 13px/1.4 ui-monospace, monospace; }
+body.export #hud { display: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="1"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 0.55"/></feComponentTransfer>
+    </filter>
+    <filter id="grainW" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="1"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 0.5"/></feComponentTransfer>
+    </filter>
+    <filter id="roughH" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="roughS" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
+
+  <img id="paper" class="layer" alt="">
+
+  <div id="shake" class="layer">
+    <!-- S1 HOOK (ink): BLACK FRIDAY tag + BUY 3 / GET 1 / FREE -->
+    <section id="s1" class="scene">
+      <div class="tag" style="top:300px" data-stamp="0">BLACK FRIDAY</div>
+      <h1 class="head center offer" id="hook" style="top:412px">
+        <span data-stamp="0">BUY 3</span>
+        <span data-stamp="0.5" style="margin-top:28px">GET 1</span>
+        <span data-stamp="1.0" style="margin-top:28px">FREE</span>
+      </h1>
+    </section>
+
+    <!-- S2 CATALOGUE (paper): the five wraps as manga panels -->
+    <section id="s2" class="scene">
+      <h1 class="head tl" id="s2head"><span data-stamp="2.5">PICK ANY 4.</span><span data-stamp="3.0">PAY FOR <em class="accent" style="font-style:normal">3.</em></span></h1>
+      <div id="grid"></div>
+      <svg class="grain grainA"><rect width="100%" height="100%" filter="url(#grain)"/></svg>
+      <svg class="layer frames" id="gridFrames" width="1080" height="1350"></svg>
+      <div class="deal" style="top:1018px" data-stamp="6.5"><b>4</b><i>WRAPS FOR A$89.97</i></div>
+      <div class="body" style="left:0;right:0;text-align:center;top:1124px;color:var(--ink)" data-stamp="7.0">A$29.99 each. The 4th one is on us.</div>
+    </section>
+
+    <!-- S3 END CARD (ink): print fan + promo stack -->
+    <section id="s3" class="scene">
+      <div id="fan"></div>
+      <svg class="layer frames" id="fanFrames" width="1080" height="1350"></svg>
+      <div class="tag" style="top:724px" data-stamp="9.5">BLACK FRIDAY</div>
+      <h1 class="head center" id="endHead" style="top:800px;color:var(--paper)" data-stamp="10.0"><span>ANIME HAND WRAPS</span></h1>
+      <h1 class="head center offer" id="endOffer" style="top:880px" data-stamp="10.5"><span>BUY 3 GET 1 FREE</span></h1>
+      <div class="body" style="left:0;right:0;text-align:center;top:972px" data-stamp="11.0">Plus 25% off apparel. 20 to 30 Nov.</div>
+      <div class="cta" style="left:0;right:0;text-align:center;top:1040px" data-stamp="11.5">SHOP NOW</div>
+    </section>
+  </div>
+
+  <img class="logo wm" id="wmB" src="assets/logos/roki-wordmark-black.png" alt="ロキ roki">
+  <img class="logo ch" id="chB" src="assets/logos/choten-block-black.png" alt="頂点へ">
+  <img class="logo wm" id="wmW" src="assets/logos/roki-wordmark-white.png" alt="ロキ roki">
+  <img class="logo ch" id="chW" src="assets/logos/choten-block-white.png" alt="頂点へ">
+
+  <div id="wipe" class="layer"></div>
+  <svg id="grainB" class="grain"><rect width="100%" height="100%" filter="url(#grain)"/></svg>
+  <svg id="grainDark" class="grain"><rect width="100%" height="100%" filter="url(#grainW)"/></svg>
+</div>
+<div id="hud"></div>
+
+<script>
+/* ---- Timeline (24 fps, 120 BPM: one beat = 0.5 s = 12 frames) ------------- */
+const FPS = 24, BPM = 120, BEAT = 60 / BPM;
+const S1 = 0, S2 = 2.5, S3 = 9.0, TOTAL = 13.5;
+const WIPES = [S3];
+const HITS = [0.5, 1.0, S2, 6.5];
+const FLASH = [S2];
+window.ROKI = { TOTAL, FPS, BPM, S1, S2, S3 };
+
+/* The five live hand wraps (Shopify, all A$29.99, all in the Buy 3 Get 1 Free discount).
+   pos = background-position that keeps the patch and print in frame. */
+const WRAPS = [
+  { name: 'THE GRAPPLER', img: 'grappler-01', pos: '45% 50%' },
+  { name: 'THE DRAGON',   img: 'dragon-01',   pos: '48% 46%' },
+  { name: 'SENDO',        img: 'sendo-01',    pos: '58% 48%' },
+  { name: 'KAMOGAWA',     img: 'kamogawa-01', pos: '45% 52%' },
+  { name: 'GOMU',         img: 'gomu-01',     pos: '62% 50%' },
+];
+
+const frame = t => Math.floor(t * FPS + 1e-6);
+const held = (t, n) => Math.floor(frame(t) / n);
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const $ = s => document.querySelector(s);
+const scenes = [['#s1', S1, S2], ['#s2', S2, S3], ['#s3', S3, TOTAL + 1]].map(([s, a, b]) => [$(s), a, b]);
+const PAPERS = ['assets/pack/paper/cool_0.jpg', 'assets/pack/paper/cool_1.jpg', 'assets/pack/paper/cool_2.jpg'];
+const PAPER_ORDER = [0, 2, 1, 2, 0, 1];
+
+/* ---- Build the catalogue grid: 3 over 2, 20px gutters, on the 60px margins --- */
+const GRID = [
+  [60, 316, 307, 340], [387, 316, 306, 340], [713, 316, 307, 340],
+  [60, 676, 470, 340], [550, 676, 470, 340],
+];
+const grid = $('#grid'), gf = $('#gridFrames');
+WRAPS.forEach((w, i) => {
+  const [x, y, wd, ht] = GRID[i], ts = 3.5 + i * BEAT;
+  const p = document.createElement('div'); p.className = 'panel'; p.dataset.stamp = ts; p.dataset.origin = 'center';
+  Object.assign(p.style, { left: x + 'px', top: y + 'px', width: wd + 'px', height: ht + 'px' });
+  p.innerHTML = `<div class="pfill" style="background-image:url(assets/photos/${w.img}.jpg);background-position:${w.pos}"></div><div class="name">${w.name}</div>`;
+  grid.appendChild(p);
+  gf.insertAdjacentHTML('beforeend', `<polygon data-stamp="${ts}" points="${x},${y} ${x + wd},${y} ${x + wd},${y + ht} ${x},${y + ht}"/>`);
+});
+
+/* ---- Build the end-card fan: five slanted strips, gutter parallel to the cut --- */
+const fan = $('#fan'), ff = $('#fanFrames');
+const FX0 = 60, FX1 = 1020, FY0 = 60, FY1 = 660, SL = 40, GUT = 18, FW = (FX1 - FX0 - GUT * 4) / 5;
+WRAPS.forEach((w, i) => {
+  const ts = S3 + i * 3 / FPS;
+  const xl = FX0 + i * (FW + GUT), xr = xl + FW;
+  const pts = [[i ? xl + SL : xl, FY0], [i < 4 ? xr + SL : xr, FY0], [xr, FY1], [xl, FY1]];
+  const d = document.createElement('div'); d.className = 'panel'; d.dataset.stamp = ts;
+  d.style.cssText = `left:0;top:0;width:1080px;height:1350px;background:none;clip-path:polygon(${pts.map(p => p[0] + 'px ' + p[1] + 'px').join(',')})`;
+  d.innerHTML = `<div class="pfill" style="left:${xl - 20}px;top:${FY0}px;width:${FW + SL + 40}px;height:${FY1 - FY0}px;right:auto;bottom:auto;background-image:url(assets/photos/${w.img}.jpg);background-position:${w.pos}"></div>`;
+  fan.appendChild(d);
+  ff.insertAdjacentHTML('beforeend', `<polygon data-stamp="${ts}" points="${pts.map(p => p.join(',')).join(' ')}"/>`);
+});
+
+/* ---- Fit headlines by measurement ------------------------------------------ */
+function fit(el, maxW, maxH, min = 30, max = 320) {
+  let lo = min, hi = max;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; el.style.fontSize = m + 'px';
+    const w = Math.max(...[...el.children].map(c => c.scrollWidth));
+    (w <= maxW && el.scrollHeight <= maxH) ? lo = m : hi = m; }
+  el.style.fontSize = lo + 'px';
+}
+
+/* ---- Wipe bands ----------------------------------------------------------- */
+const wipe = $('#wipe');
+for (let i = 0; i < 8; i++) {
+  const b = document.createElement('div'); b.className = 'band';
+  b.style.top = (-90 + i * 200) + 'px';
+  b.innerHTML = '<div class="btail"></div><div class="solid"></div><div class="bhead"></div>';
+  wipe.appendChild(b);
+}
+const bands = [...wipe.children];
+
+/* ---- Stepped stamp entrance: scale 1.12 -> 1 over 3 frames + paper jolt ---- */
+const STAMP_S = [1.12, 1.06, 1.02], JOLT = [[7, -5], [-4, 3]];
+function stamp(el, ts, t) {
+  const k = frame(t) - frame(ts);
+  if (k < 0) { el.style.visibility = 'hidden'; return; }
+  el.style.visibility = 'inherit';
+  const s = k < 3 ? STAMP_S[k] : 1, j = k < 2 ? JOLT[k] : [0, 0];
+  const base = el.dataset.base || '';
+  el.style.transform = `${base} translate(${j[0]}px,${j[1]}px) scale(${s})`;
+}
+
+let stamps = [];
+function seek(t) {
+  const f = frame(t), dark = t < S2 || t >= S3;
+
+  for (const [el, a, b] of scenes) el.style.visibility = (t >= a && t < b) ? 'visible' : 'hidden';
+  $('#stage').style.background = dark ? 'var(--ink)' : 'var(--paper)';
+
+  const p = $('#paper'); p.style.visibility = dark ? 'hidden' : 'visible';
+  const src = PAPERS[PAPER_ORDER[held(t, 4) % PAPER_ORDER.length]];
+  if (!p.src.endsWith(src)) p.src = src;
+
+  for (const id of ['#grain', '#grainW']) $(id + ' feTurbulence').setAttribute('seed', 1 + held(t, 2) % 40);
+  $('#roughH feTurbulence').setAttribute('seed', 3 + held(t, 4) % 3);
+  $('#roughS feTurbulence').setAttribute('seed', 5 + held(t, 4) % 3);
+  $('#grainB').style.visibility = dark ? 'hidden' : 'visible';
+  $('#grainDark').style.visibility = dark ? 'visible' : 'hidden';
+
+  for (const [el, ts] of stamps) stamp(el, ts, t);
+
+  // stepped push-in inside each catalogue panel and fan strip (4-frame holds, never smooth)
+  const gh = Math.max(0, held(t - 3.5, 4));
+  grid.querySelectorAll('.pfill').forEach((el, i) => el.style.transform = `scale(${1.03 + Math.min(gh, 30) * .003})`);
+  const fh = Math.max(0, held(t - S3, 4));
+  fan.querySelectorAll('.pfill').forEach(el => el.style.transform = `scale(${1.02 + Math.min(fh, 30) * .0025})`);
+
+  $('#wmB').style.visibility = $('#chB').style.visibility = dark ? 'hidden' : 'visible';
+  $('#wmW').style.visibility = $('#chW').style.visibility = dark ? 'visible' : 'hidden';
+
+  let sx = 0, sy = 0;
+  HITS.forEach((h, i) => { const k = f - frame(h); if (k >= 0 && k < 8) {
+    const r = mulberry32(1000 + i * 31 + (k >> 1)), amp = 12 * (1 - k / 8);
+    sx += (r() * 2 - 1) * amp; sy += (r() * 2 - 1) * amp; } });
+  $('#shake').style.transform = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px)`;
+
+  let showWipe = false;
+  for (const c of WIPES) {
+    const s = Math.floor((f - frame(c) + 6) / 2);
+    if (s >= 0 && s <= 6) { showWipe = true;
+      bands.forEach((b, i) => b.style.transform = `translateX(${-3400 + 4480 * s / 6 + i * 40}px) rotate(-3deg)`); }
+  }
+  wipe.style.visibility = showWipe ? 'visible' : 'hidden';
+
+  const flash = FLASH.some(h => f - frame(h) >= 0 && f - frame(h) < 2);
+  $('#stage').style.filter = flash ? 'invert(1)' : 'none';
+
+  $('#hud').textContent = `t ${t.toFixed(3)}s  f ${f}  beat ${(t / BEAT + 1).toFixed(2)}`;
+}
+window.seek = seek;
+
+/* ---- Boot ------------------------------------------------------------------ */
+const exportMode = location.search.includes('export');
+if (exportMode) document.body.classList.add('export');
+const imgs = [...PAPERS, 'assets/pack/brush/stroke_3.png', ...WRAPS.map(w => `assets/photos/${w.img}.jpg`)];
+Promise.all([document.fonts.ready, ...imgs.map(u => new Promise(r => { const i = new Image(); i.onload = i.onerror = r; i.src = u; })),
+  ...[...document.images].map(i => i.complete ? 0 : new Promise(r => i.onload = i.onerror = r))]).then(() => {
+  scenes.forEach(([el]) => el.style.visibility = 'visible');
+  fit($('#hook'), 900, 660);
+  fit($('#s2head'), 960, 200);
+  fit($('#endHead'), 960, 70);
+  fit($('#endOffer'), 960, 70);
+  // centred tags and the deal box stamp from their centre
+  document.querySelectorAll('.tag, .deal').forEach(el => el.dataset.base = 'translateX(-50%)');
+  stamps = [...document.querySelectorAll('[data-stamp]')].map(el => [el, +el.dataset.stamp]);
+  document.querySelectorAll('.center [data-stamp], .center[data-stamp], .tag, .deal, .panel, polygon').forEach(el => el.style.transformOrigin = 'center');
+  document.querySelectorAll('polygon').forEach(el => el.style.transformBox = 'fill-box');
+  seek(0);
+  window.ready = true;
+  if (!exportMode) play();
+});
+
+let playing = false, t0 = 0, tNow = 0;
+function loop(now) { if (!playing) return; tNow = ((now - t0) / 1000) % TOTAL; seek(tNow); requestAnimationFrame(loop); }
+function play() { playing = true; t0 = performance.now() - tNow * 1000; requestAnimationFrame(loop); }
+addEventListener('keydown', e => {
+  if (e.code === 'Space') { playing ? (playing = false) : play(); e.preventDefault(); }
+  if (e.code === 'ArrowRight' || e.code === 'ArrowLeft') { playing = false; tNow = Math.max(0, Math.min(TOTAL, tNow + (e.code === 'ArrowRight' ? 1 : -1) / FPS)); seek(tNow); }
+  if (e.code === 'KeyR') { tNow = 0; play(); }
+});
+</script>
+</body>
+</html>
