@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AD-005 Motion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+<style>
+  @font-face { font-family:"Druk Wide"; src:url("../layout/fonts/DrukWide-Bold.ttf") format("truetype"); font-weight:700; }
+  @font-face { font-family:"Anime Ace"; src:url("../layout/fonts/AnimeAce-Bold.ttf") format("truetype"); font-weight:700; }
+  :root {
+    /* Roki tokens */
+    --RokiRed:#8a0000; --signal-red:#d52828; --promo-yellow:#ffea00;
+    --ink:#080808; --paper:#ffffff; --studio-grey:#e3e6e7; --ink-muted:#5a5a5a;
+    --space-1:16px; --space-2:32px; --space-3:60px; --space-4:96px;
+    --border-frame:3px; --border-panel:8px;
+    --font-display:"Druk Wide","Arial Black",sans-serif;
+    --font-comic:"Anime Ace","Comic Sans MS",cursive;
+    --font-body:Poppins,"Helvetica Neue",Arial,sans-serif;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#8a8a8a; }
+  .screen { position:relative; width:1080px; height:1920px; overflow:hidden; margin-bottom:40px;
+            --ground:var(--studio-grey); --mark:var(--ink);
+            background-color:var(--ground); background-image:url(../layout/img/paper.jpg); background-blend-mode:multiply; background-size:cover; }
+  .screen.paper { --ground:var(--paper); }
+  .screen.dark  { --ground:var(--ink); --mark:var(--paper); background-image:none; }
+  .abs { position:absolute; }
+
+  /* tinted alpha assets (grunge pack): colour comes from a role */
+  .mk { position:absolute; background:var(--mark); -webkit-mask-size:100% 100%; mask-size:100% 100%; -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat; pointer-events:none; }
+
+  /* framed photos for the collage (screen 1) */
+  .ph { position:absolute; border:var(--border-frame) solid var(--paper); box-shadow:12px 12px 0 var(--ink); background:var(--paper); overflow:hidden; transform:rotate(-3deg); }
+  .ph img { width:100%; height:100%; object-fit:cover; display:block; }
+  .tape { position:absolute; width:220px; height:58px; mix-blend-mode:multiply; opacity:.85; }
+
+  /* manga panels: clip-path content + one SVG stroke overlay per screen */
+  .pn { position:absolute; inset:0; }
+  .pn img { position:absolute; object-fit:cover; display:block; }
+  .finish img { filter:contrast(1.1) brightness(.95); }
+  .finish::after { content:""; position:absolute; inset:0; background:url(../layout/img/dots.png); background-size:300px; opacity:.2; mix-blend-mode:multiply; }
+  svg.strokes { position:absolute; inset:0; width:1080px; height:1920px; overflow:visible; filter:url(#roughS); }
+
+  /* logos: supplied files, untouched */
+  .wm { position:absolute; left:60px; top:1567px; width:210px; }
+  .ch { position:absolute; right:60px; width:190px; }
+  .ch.top { top:300px; } .ch.bot { top:1572px; }
+
+  /* type */
+  .hx { font:700 104px/0.92 var(--font-display); letter-spacing:-1px; text-transform:uppercase; color:var(--ink); filter:url(#rough); }
+  .acc { color:var(--RokiRed); }
+  .cbox { position:absolute; background:var(--paper); border:var(--border-frame) solid var(--ink); padding:12px 16px 10px;
+          font:700 28px/1 var(--font-comic); color:var(--ink); white-space:nowrap; text-transform:uppercase; }
+  .cap { font:400 30px/1.3 var(--font-body); }
+  .offer { font:700 74px/0.95 var(--font-display); color:var(--promo-yellow); text-transform:uppercase; text-align:center; filter:url(#rough); }
+  .bar { position:absolute; left:60px; right:60px; background:var(--signal-red); color:var(--paper); display:flex; align-items:center; justify-content:center;
+         font:700 26px/1 var(--font-display); text-transform:uppercase; height:84px; white-space:nowrap; }
+
+  /* manga speech bubbles, drawn by script below */
+  svg.sfx { position:absolute; overflow:visible; }
+  svg.sfx text { font-family:"Druk Wide"; font-weight:700; text-anchor:middle; dominant-baseline:central; }
+
+  /* grain B over everything */
+  .grain { position:absolute; inset:0; filter:url(#grain); mix-blend-mode:multiply; opacity:.06; pointer-events:none; }
+  .dark .grain { mix-blend-mode:screen; opacity:.07; }
+  /* motion stage: all scenes share one 1080x1920 frame */
+  html, body { width:1080px; height:1920px; overflow:hidden; background:#000; }
+  .screen { position:absolute; left:0; top:0; margin:0; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="roughS" x="-2%" y="-2%" width="104%" height="104%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="1"/>
+    <feColorMatrix type="saturate" values="0"/>
+    <feComponentTransfer><feFuncA type="table" tableValues="0 0.55"/></feComponentTransfer>
+  </filter>
+</svg>
+
+<!-- 1 · Hook: taped collage -->
+<section class="screen" id="s1">
+  <div class="mk" style="left:20px;top:290px;width:1040px;height:1000px;opacity:.12;-webkit-mask-image:url(../layout/g/dot_45_8_radial.png);mask-image:url(../layout/g/dot_45_8_radial.png)"></div>
+  <div class="mk" style="left:-200px;top:150px;width:400px;height:450px;opacity:.85;-webkit-mask-image:url(../layout/g/splat_3.png);mask-image:url(../layout/g/splat_3.png)"></div>
+  <div class="ph" style="left:90px;top:330px;width:500px;height:625px"><img src="../layout/img/hands-dragon.jpg" alt="Green wrapped fist" style="object-position:40% 55%"></div>
+  <div class="ph" style="left:540px;top:420px;width:460px;height:575px"><img src="../layout/img/kamogawa-02.jpg" alt="Kamogawa wraps rolled"></div>
+  <div class="ph" style="left:270px;top:800px;width:470px;height:470px"><img src="../layout/img/grappler-02.jpg" alt="Grappler wraps rolled" style="object-position:50% 45%"></div>
+  <img class="tape" src="../layout/g/masking_0.png" style="left:470px;top:330px;transform:rotate(28deg)" alt="">
+  <img class="tape" src="../layout/g/masking_1.png" style="left:860px;top:960px;transform:rotate(28deg)" alt="">
+  <div class="abs hx" style="left:60px;top:1336px;width:960px;text-align:center">4 pairs.<br>Pay for <span class="acc">3.</span></div>
+  <img class="ch top" src="../layout/img/choten-black.png" alt="頂点へ">
+  <img class="wm" src="../layout/img/wordmark-black.png" alt="ロキ roki">
+  <div class="grain"></div>
+</section>
+
+<!-- 2 · Showcase: every hand wrap in the range, one manga page -->
+<section class="screen paper" id="s2">
+  <div class="pn" style="clip-path:polygon(60px 300px,540px 300px,532px 690px,60px 694px)"><img src="../layout/img/kamogawa-02.jpg" alt="Kamogawa" style="left:60px;top:230px;width:480px;height:600px;object-position:50% 55%"></div>
+  <div class="pn" style="clip-path:polygon(560px 300px,1020px 300px,1020px 686px,552px 690px)"><img src="../layout/img/gomu-02.jpg" alt="Gomu" style="left:552px;top:230px;width:468px;height:585px;object-position:50% 60%"></div>
+  <div class="pn" style="clip-path:polygon(60px 714px,1020px 706px,1020px 1086px,60px 1094px)"><img src="../layout/img/grappler-01.jpg" alt="Grappler" style="left:60px;top:420px;width:960px;height:960px;object-position:50% 50%"></div>
+  <div class="pn" style="clip-path:polygon(60px 1114px,548px 1110px,540px 1500px,60px 1500px)"><img src="../layout/img/sendo-02.jpg" alt="Sendo" style="left:60px;top:1040px;width:488px;height:610px;object-position:50% 55%"></div>
+  <div class="pn" style="clip-path:polygon(568px 1110px,1020px 1106px,1020px 1500px,560px 1500px)"><img src="../layout/img/dragon-02.jpg" alt="Dragon" style="left:560px;top:1040px;width:460px;height:575px;object-position:50% 50%"></div>
+  <svg class="strokes" viewBox="0 0 1080 1920"><g fill="none" stroke="#080808" stroke-width="8" stroke-linejoin="miter">
+    <polygon points="60,300 540,300 532,690 60,694"/><polygon points="560,300 1020,300 1020,686 552,690"/>
+    <polygon points="60,714 1020,706 1020,1086 60,1094"/>
+    <polygon points="60,1114 548,1110 540,1500 60,1500"/><polygon points="568,1110 1020,1106 1020,1500 560,1500"/></g></svg>
+  <div class="cbox" style="left:84px;top:324px">Kamogawa</div>
+  <div class="cbox" style="left:584px;top:324px">Gomu</div>
+  <div class="cbox" style="left:84px;top:1012px">Grappler</div>
+  <div class="cbox" style="left:84px;top:1424px">Sendo</div>
+  <div class="cbox" style="left:584px;top:1424px">Dragon</div>
+  <img class="wm" src="../layout/img/wordmark-black.png" alt="">
+  <img class="ch bot" src="../layout/img/choten-black.png" alt="">
+  <div class="grain"></div>
+</section>
+
+<!-- 3 · The value: headline first, four slice panels, speech bubbles -->
+<section class="screen" id="s3">
+  <div class="mk" style="left:0;top:560px;width:1080px;height:1000px;opacity:.1;-webkit-mask-image:url(../layout/g/dot_15_10_linear.png);mask-image:url(../layout/g/dot_15_10_linear.png)"></div>
+  <div class="abs hx" style="left:60px;top:336px;width:960px;font-size:96px">4 pairs for<br>$89.97</div>
+  <div class="mk" style="--mark:var(--signal-red);left:-40px;top:524px;width:1160px;height:56px;-webkit-mask-image:url(../layout/g/stroke_3.png);mask-image:url(../layout/g/stroke_3.png)"></div>
+  <div class="pn" style="clip-path:polygon(60px 620px,290px 620px,270px 1420px,60px 1420px)"><img src="../layout/img/kamogawa.jpg" alt="Kamogawa" style="left:60px;top:620px;width:230px;height:800px;object-position:40% 50%"></div>
+  <div class="pn" style="clip-path:polygon(310px 620px,540px 620px,520px 1420px,290px 1420px)"><img src="../layout/img/gomu-03.jpg" alt="Gomu" style="left:290px;top:620px;width:250px;height:800px;object-position:50% 50%"></div>
+  <div class="pn" style="clip-path:polygon(560px 620px,790px 620px,770px 1420px,540px 1420px)"><img src="../layout/img/sendo-03.jpg" alt="Sendo" style="left:540px;top:620px;width:250px;height:800px;object-position:45% 50%"></div>
+  <div class="pn" style="clip-path:polygon(810px 620px,1020px 620px,1020px 1420px,790px 1420px)"><img src="../layout/img/dragon.jpg" alt="Dragon" style="left:790px;top:620px;width:230px;height:800px;object-position:55% 50%"></div>
+  <svg class="strokes" viewBox="0 0 1080 1920"><g fill="none" stroke="#080808" stroke-width="8" stroke-linejoin="miter">
+    <polygon points="60,620 290,620 270,1420 60,1420"/><polygon points="310,620 540,620 520,1420 290,1420"/>
+    <polygon points="560,620 790,620 770,1420 540,1420"/><polygon points="810,620 1020,620 1020,1420 790,1420"/></g></svg>
+  <svg class="sfx" data-text="PAID" style="left:75px;top:730px" width="190" height="190"></svg>
+  <svg class="sfx" data-text="PAID" style="left:325px;top:930px" width="190" height="190"></svg>
+  <svg class="sfx" data-text="PAID" style="left:575px;top:1130px" width="190" height="190"></svg>
+  <svg class="sfx" data-text="FREE" data-free="1" style="left:755px;top:1240px" width="250" height="250"></svg>
+  <img class="wm" src="../layout/img/wordmark-black.png" alt="">
+  <div class="grain"></div>
+</section>
+
+<!-- 4 · Offer and close: brush mark, splash panel, promo stack on ink -->
+<section class="screen dark" id="s4">
+  <img src="../layout/img/choten-brush-white.png" alt="頂点へ" class="abs" style="left:300px;top:300px;width:480px">
+  <div class="pn finish" style="clip-path:polygon(60px 552px,1020px 536px,1020px 1040px,60px 1040px)"><img src="../layout/img/m-grappler-07.jpg" alt="Red wrapped fist" style="left:-65px;top:34px;width:1100px;height:1375px"></div>
+  <svg class="strokes" viewBox="0 0 1080 1920"><g fill="none" stroke="#ffffff" stroke-width="8"><polygon points="60,552 1020,536 1020,1040 60,1040"/></g></svg>
+  <div class="abs offer" style="left:60px;top:1100px;width:960px">Buy 3 get 1<br>free wraps</div>
+  <div class="abs cap" style="left:60px;top:1262px;width:960px;text-align:center;color:var(--paper)">27 Nov – 1 Dec</div>
+  <div class="bar" style="top:1350px">Shop now at rokiovertime.com</div>
+  <img class="wm" src="../layout/img/wordmark-white.png" alt="">
+  <div class="grain"></div>
+</section>
+
+<script>
+// plain circle bubbles: paper (PAID) or signal-red (FREE), ink keyline, hard ink offset
+const NS = "http://www.w3.org/2000/svg";
+document.querySelectorAll("svg.sfx").forEach((s, i) => {
+  const w = +s.getAttribute("width"), free = !!s.dataset.free, c = w / 2, r = c - 6;
+  const circ = (dx, fill, stroke) => { const e = document.createElementNS(NS, "circle");
+    e.setAttribute("cx", c + dx); e.setAttribute("cy", c + dx); e.setAttribute("r", r); e.setAttribute("fill", fill);
+    if (stroke) { e.setAttribute("stroke", "#080808"); e.setAttribute("stroke-width", "6"); } return e; };
+  const t = document.createElementNS(NS, "text"); t.textContent = s.dataset.text;
+  t.setAttribute("x", c); t.setAttribute("y", c + 2); t.setAttribute("font-size", free ? "50" : "34");
+  if (free) { t.setAttribute("fill", "#ffffff"); t.setAttribute("stroke", "#080808"); t.setAttribute("stroke-width", "9"); t.setAttribute("paint-order", "stroke"); t.setAttribute("stroke-linejoin", "round"); }
+  else t.setAttribute("fill", "#080808");
+  s.append(circ(8, "#080808"), circ(0, free ? "#d52828" : "#ffffff", true), t);
+  s.style.transform = `rotate(${free ? -8 : (i % 2 ? 6 : -6)}deg)`;
+});
+</script>
+<script src="motion.js"></script>
+</body>
+</html>
