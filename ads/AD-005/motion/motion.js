@@ -2,12 +2,15 @@
 // Paper-grunge timing: 24 fps, stepped (held) frames, stamp entrances, panels cut in on twos.
 (() => {
 const FPS = 24, DUR = 14;
+// re-paced to the song: 87.5 BPM, one beat = 0.6857 s; film beat 0 = song 18.514 s, FREE lands on the drop (beat 13)
+const B = 60 / 87.5;
 const frame = t => Math.floor(t * FPS + 1e-6);
 const held = (t, n) => Math.floor(frame(t) / n);
+const onF = t => Math.ceil(t * FPS - 1e-6);      // first frame on which a cue at time t is visible
 function rnd(seed){ let s = seed >>> 0; return () => ((s = Math.imul(s ^ (s >>> 15), 2246822519) + 0x9e3779b9 >>> 0) / 4294967296); }
 
 // scene windows (s): hook, showcase, value, close
-const SC = [["#s1", 0, 2.0], ["#s2", 2.0, 6.5], ["#s3", 6.5, 10.5], ["#s4", 10.5, 14.0]];
+const SC = [["#s1", 0, 3 * B], ["#s2", 3 * B, 9 * B], ["#s3", 9 * B, 16 * B], ["#s4", 16 * B, 14.0]];
 const $ = (q, r = document) => r.querySelector(q), $$ = (q, r = document) => [...r.querySelectorAll(q)];
 
 // split the two-line headlines into lines so each line can stamp on its own
@@ -23,29 +26,29 @@ const add = (el, t, fx, o = {}) => el && tracks.push(Object.assign({ el, t, fx }
 
 // 1 · Hook
 { const mk = $$(".mk", S1), ph = $$(".ph", S1), tape = $$(".tape", S1), ln = $$(".hx .ln", S1);
-  add(mk[0], 0, "on"); add(mk[1], 0.08, "stamp");
-  ph.forEach((e, i) => add(e, i * 0.17, "stamp"));
-  tape.forEach((e, i) => add(e, 0.5 + i * 0.08, "cut"));
-  add(ln[0], 0.66, "stamp"); add(ln[1], 0.95, "stamp"); add($(".acc", S1), 1.2, "pop"); }
+  add(mk[0], 0, "on"); add(mk[1], 0.125 * B, "stamp");
+  ph.forEach((e, i) => add(e, i * 0.25 * B, "stamp"));
+  tape.forEach((e, i) => add(e, 0.75 * B + i * 0.125 * B, "cut"));
+  add(ln[0], 1 * B, "stamp"); add(ln[1], 1.5 * B, "stamp"); add($(".acc", S1), 2 * B, "pop"); }
 
 // 2 · Showcase: panels cut in on twos, captions stamp, slow stepped push-in
 { const pn = $$(".pn", S2), poly = $$("svg.strokes polygon", S2), cb = $$(".cbox", S2);
-  pn.forEach((e, i) => { const t = 2.0 + i * 0.25; add(e, t, "cut"); add(poly[i], t, "cut"); add(cb[i], t + 0.17, "stamp");
-    add($("img", e), t, "push", { end: 6.5, amt: 0.05 }); }); }
+  pn.forEach((e, i) => { const t = (3 + i * 0.5) * B; add(e, t, "cut"); add(poly[i], t, "cut"); add(cb[i], t + 0.25 * B, "stamp");
+    add($("img", e), t, "push", { end: 9 * B, amt: 0.05 }); }); }
 
 // 3 · Value
 { const mk = $$(".mk", S3), ln = $$(".hx .ln", S3), pn = $$(".pn", S3), poly = $$("svg.strokes polygon", S3), sfx = $$("svg.sfx", S3);
-  add(mk[0], 6.5, "on"); add(ln[0], 6.5, "stamp"); add(ln[1], 6.66, "stamp");
-  add(mk[1], 6.83, "wipe", { steps: 5, dur: 0.21 });
-  pn.forEach((e, i) => { const t = 7.0 + i * 0.125; add(e, t, "cut"); add(poly[i], t, "cut"); add($("img", e), t, "push", { end: 10.5, amt: 0.04 }); });
-  sfx.forEach((e, i) => add(e, [7.7, 8.1, 8.5, 9.0][i], "stamp", { big: i === 3 })); }
-const HIT = 9.0;              // FREE lands: impact frame + shake
+  add(mk[0], 9 * B, "on"); add(ln[0], 9 * B, "stamp"); add(ln[1], 9.5 * B, "stamp");
+  add(mk[1], 10 * B, "wipe", { steps: 5, dur: 0.21 });
+  pn.forEach((e, i) => { const t = (10.5 + i * 0.25) * B; add(e, t, "cut"); add(poly[i], t, "cut"); add($("img", e), t, "push", { end: 16 * B, amt: 0.04 }); });
+  sfx.forEach((e, i) => add(e, [11.5, 12, 12.5, 13][i] * B, "stamp", { big: i === 3 })); }
+const HIT = 13 * B;              // FREE lands: impact frame + shake
 
 // 4 · Close
 { const brush = $("img.abs", S4), pn = $(".pn", S4), poly = $("svg.strokes polygon", S4);
-  add(brush, 10.5, "wipe", { steps: 6, dur: 0.25 });
-  add(pn, 10.83, "cut"); add(poly, 10.83, "cut"); add($("img", pn), 10.83, "push", { end: 14, amt: 0.06 });
-  add($(".offer", S4), 11.3, "stamp"); add($(".cap", S4), 11.62, "cut"); add($(".bar", S4), 11.83, "stamp"); }
+  add(brush, 16 * B, "wipe", { steps: 6, dur: 0.25 });
+  add(pn, 16.5 * B, "cut"); add(poly, 16.5 * B, "cut"); add($("img", pn), 16.5 * B, "push", { end: 14, amt: 0.06 });
+  add($(".offer", S4), 17 * B, "stamp"); add($(".cap", S4), 17.5 * B, "cut"); add($(".bar", S4), 18 * B, "stamp"); }
 
 // stamp curve: 1.12 → 1.0 over 3 frames (held), FREE overshoots harder
 const STAMP = [1.12, 1.06, 1.02], STAMP_BIG = [1.3, 1.15, 1.05, 1.01];
@@ -61,7 +64,7 @@ window.seek = async (t) => {
   SC.forEach(([q, a, b]) => { $(q).style.visibility = (t >= a && t < b) ? "visible" : "hidden"; });
   // tracks
   for (const k of tracks) {
-    const dt = t - k.t, df = frame(t) - frame(k.t), el = k.el, isSvg = el instanceof SVGElement && el.tagName !== "svg";
+    const dt = t - k.t, df = frame(t) - onF(k.t), el = k.el, isSvg = el instanceof SVGElement && el.tagName !== "svg";
     const show = dt >= -1e-6;
     if (isSvg) { el.setAttribute("visibility", show ? "visible" : "hidden"); continue; }
     if (k.fx === "push") { const p = Math.min(1, Math.max(0, (held(t, 4) * 4 / FPS - k.t) / (k.end - k.t)));
@@ -74,11 +77,11 @@ window.seek = async (t) => {
       el.style.clipPath = `inset(-20% ${((1 - p) * 100).toFixed(1)}% -20% 0)`; }
   }
   // paper jolt on each scene's first 2 frames, FREE impact shake (held on twos, decays over 8 frames)
-  for (const [q, a] of SC) { const s = $(q), fa = f - frame(a); let x = 0, y = 0;
-    if (fa >= 0 && fa < 2) { const [jx, jy] = shakeRnd(frame(a)); x = jx * 6; y = jy * 6; }
-    if (q === "#s3") { const fh = f - frame(HIT); if (fh >= 0 && fh < 8) { const [sx, sy] = shakeRnd(frame(HIT) + (fh >> 1)); const amp = 14 * (1 - fh / 8); x += sx * amp; y += sy * amp; } }
+  for (const [q, a] of SC) { const s = $(q), fa = f - onF(a); let x = 0, y = 0;
+    if (fa >= 0 && fa < 2) { const [jx, jy] = shakeRnd(onF(a)); x = jx * 6; y = jy * 6; }
+    if (q === "#s3") { const fh = f - onF(HIT); if (fh >= 0 && fh < 8) { const [sx, sy] = shakeRnd(onF(HIT) + (fh >> 1)); const amp = 14 * (1 - fh / 8); x += sx * amp; y += sy * amp; } }
     s.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`; }
-  S3.style.filter = (f === frame(HIT)) ? "invert(1)" : "none";
+  S3.style.filter = (f === onF(HIT)) ? "invert(1)" : "none";
   // textures: paper breathes on fours, ink edges boil on fours, grain crawls on twos
   const ph = held(t, 4), pr = rnd(500 + (ph % 12));
   document.querySelectorAll(".screen:not(.dark)").forEach(s => s.style.backgroundPosition = `${Math.round((pr() - .5) * 8)}px ${Math.round((pr() - .5) * 8)}px`);
