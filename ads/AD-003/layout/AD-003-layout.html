@@ -1,0 +1,80 @@
+<!doctype html><html><head><meta charset="utf-8"><title>AD-003 V5</title>
+<style>
+@font-face{font-family:"Druk Wide";src:url(assets/DrukWide-Bold.ttf);font-weight:700}
+@font-face{font-family:"Anime Ace";src:url(assets/AnimeAce-Bold.ttf);font-weight:700}
+@font-face{font-family:Poppins;src:url(assets/poppins-700.woff2);font-weight:700}
+@font-face{font-family:Poppins;src:url(assets/poppins-400.woff2);font-weight:400}
+:root{--ink:#080808;--paper:#ffffff;--RokiRed:#8a0000;--studio-grey:#e3e6e7;
+  --space-1:16px;--space-2:32px;--space-3:60px;--space-4:96px;--border-frame:3px;--border-panel:8px}
+html,body{margin:0;padding:0;background:#777}
+.f{position:relative;width:1080px;height:1350px;overflow:hidden;background-color:var(--ground);
+  }
+.stock{position:absolute;inset:0;background:url(assets/paper_cool_0.jpg) center/cover;mix-blend-mode:multiply;opacity:.45}
+.f.paper{--ground:var(--paper)} .f.grey{--ground:var(--studio-grey)}
+.pn{position:absolute;inset:0}
+.pn img{position:absolute;object-fit:cover;display:block}
+svg.strokes{position:absolute;inset:0;width:1080px;height:1350px;pointer-events:none}
+.kick{position:absolute;background:var(--paper);border:var(--border-frame) solid var(--ink);
+  font:700 32px/1.1 "Anime Ace";color:var(--ink);padding:18px 24px 14px;white-space:nowrap;z-index:5}
+.txt{position:absolute;left:60px;right:60px;bottom:153px;z-index:5}
+.head{display:inline-block;font:700 72px/0.95 "Druk Wide";letter-spacing:0;color:var(--ink);
+  text-transform:uppercase;white-space:nowrap;filter:url(#rough)}
+.head .acc{color:var(--RokiRed)}
+.cta{margin-top:var(--space-1);font:700 28px/1.1 Poppins;color:var(--RokiRed);letter-spacing:.5px;text-transform:uppercase}
+.wm{position:absolute;left:60px;bottom:60px;width:210px;z-index:6}
+.ch{position:absolute;right:60px;top:60px;width:190px;z-index:6}
+.grainB{position:absolute;inset:0;z-index:9;mix-blend-mode:multiply;opacity:.06;filter:url(#grain);background:#fff}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute">
+ <filter id="rough" x="-5%" y="-10%" width="110%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="n"/>
+  <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n"/>
+  <feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 0.55"/></feComponentTransfer></filter>
+</svg>
+<div class="f paper" id="frame">
+  <div class="stock"></div>
+  <div id="panels"></div>
+  <svg class="strokes" id="strokes"><g fill="none" stroke="#080808" stroke-width="8" stroke-linejoin="miter" filter="url(#rough)" id="sg"></g></svg>
+  <div class="kick" id="kick">STUCK IN FILLER EPISODES?</div>
+  <div class="txt" id="txt"><div class="head" id="head">START YOUR<br>TRAINING <span class="acc">ARC</span></div>
+    <div class="cta">Explore the range</div></div>
+  <img class="ch" src="assets/choten-block-black.png" alt="頂点へ">
+  <img class="wm" src="assets/roki-wordmark-black.png" alt="ロキ roki">
+  <div class="grainB"></div>
+</div>
+<script>
+const CFG = {"layout": "trio", "hero": "v5e-hero.jpg", "right": ["v5c-wrist.jpg", "v5e-rise.jpg"], "heroW": 640, "kicker": "top", "maxHead": 88};
+function fit(el, maxW, maxH, min=40, max=96){let lo=min,hi=max;while(hi-lo>1){const m=(lo+hi)>>1;el.style.fontSize=m+'px';
+  (el.scrollWidth<=maxW&&el.scrollHeight<=maxH)?lo=m:hi=m}el.style.fontSize=lo+'px';return lo}
+function addPanel(pts, img, box){
+  const d=document.createElement('div');d.className='pn';
+  d.style.clipPath='polygon('+pts.map(p=>p[0]+'px '+p[1]+'px').join(',')+')';
+  const i=document.createElement('img');i.src='assets/'+img;
+  Object.assign(i.style,{left:box[0]+'px',top:box[1]+'px',width:box[2]+'px',height:box[3]+'px'});
+  d.appendChild(i);document.getElementById('panels').appendChild(d);
+  const p=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  p.setAttribute('points',pts.map(q=>q.join(',')).join(' '));document.getElementById('sg').appendChild(p);
+}
+document.fonts.ready.then(()=>{
+  const head=document.getElementById('head'), txt=document.getElementById('txt'), kick=document.getElementById('kick');
+  const size=fit(head, 960, 2*0.95*96+4, 40, CFG.maxHead);
+  const tTop=txt.getBoundingClientRect().top - document.getElementById('frame').getBoundingClientRect().top;
+  const top=190, bot=Math.round(tTop-(CFG.kicker==='bottom'?76:40)), L=60, R=1020, G=20;
+  const kh=kick.offsetHeight;
+  if(CFG.layout==='single'){
+    addPanel([[L,top],[R,top],[R,bot],[L,bot]], CFG.hero, [L,top,R-L,bot-top]);
+  } else if(CFG.layout==='slant'){
+    const drop=50; // ~3 degree cut, lower on the left
+    addPanel([[L,top],[R,top],[R,bot-drop],[L,bot]], CFG.hero, [L,top,R-L,bot-top]);
+  } else {
+    const hw=CFG.heroW, x2=L+hw+G, mid=Math.round((top+bot)/2);
+    addPanel([[L,top],[L+hw,top],[L+hw,bot],[L,bot]], CFG.hero, [L,top,hw,bot-top]);
+    addPanel([[x2,top],[R,top],[R,mid-G/2],[x2,mid-G/2]], CFG.right[0], [x2,top,R-x2,mid-G/2-top]);
+    addPanel([[x2,mid+G/2],[R,mid+G/2],[R,bot],[x2,bot]], CFG.right[1], [x2,mid+G/2,R-x2,bot-mid-G/2]);
+  }
+  if(CFG.kicker==='bottom'){ kick.style.left='100px'; kick.style.top=(bot-kh/2)+'px'; }
+  else { kick.style.left='100px'; kick.style.top=(top-kh/2)+'px'; }
+  if(CFG.layout==='slant'){ kick.style.transform='rotate(-2.7deg)'; kick.style.transformOrigin='left center'; }
+  document.title='ready '+size;
+});
+</script></body></html>
