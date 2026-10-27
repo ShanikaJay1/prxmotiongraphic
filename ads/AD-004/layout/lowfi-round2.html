@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AD-004 Low-fi Round 2</title>
+<style>
+  :root{--bg:#f4f4f2;--fg:#151515;--muted:#6b6b6b}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:32px 16px 64px}
+  header,section{max-width:1200px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 4px}
+  h2{font-size:18px;margin:48px 0 4px}
+  p.sub{margin:0 0 4px;color:var(--muted);max-width:780px}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin:16px 0 0;color:var(--muted);font-size:13px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:14px;height:14px;display:inline-block;border:1px solid #1d1d1d}
+  .row{display:flex;flex-wrap:wrap;gap:20px;margin-top:16px}
+  figure{margin:0;width:270px}
+  figcaption{font-size:12px;color:var(--muted);margin-top:8px}
+  figcaption b{color:var(--fg)}
+  .frame{width:270px;height:480px;position:relative;overflow:hidden;outline:1px solid #999}
+  .c{position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.25);transform-origin:0 0;font-family:"Arial Black",Arial,sans-serif;background:#2a2a2a}
+
+  .panel{position:absolute;overflow:hidden;border:8px solid #0c0c0c;outline:3px solid #fff;background:repeating-linear-gradient(135deg,#c9c9c6 0 28px,#b5b5b1 28px 56px)}
+  .panel.frozen{background:repeating-linear-gradient(135deg,#8e8e8b 0 28px,#7f7f7c 28px 56px)}
+  .panel.bleed{border:0;outline:0}
+  .panel.dim::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.45)}
+  .lbl{position:absolute;left:24px;right:24px;top:50%;transform:translateY(-50%);font:600 30px/1.25 system-ui,sans-serif;color:#333;background:rgba(255,255,255,.85);padding:12px 18px}
+  .lbl small{display:block;font-size:24px;font-weight:400;color:#555}
+  .t{position:absolute;background:#0c0c0c;color:#fff;border:3px solid #fff;padding:16px 22px;text-transform:uppercase;letter-spacing:-.5px;z-index:2}
+  .cta{position:absolute;font:700 30px/1.1 system-ui,sans-serif;text-transform:uppercase;color:#fff;border:3px dashed #fff;padding:12px 18px;z-index:2;white-space:nowrap}
+  .wm,.ch{position:absolute;background:#fff;border:4px solid #1d1d1d;font:700 30px/1 system-ui,sans-serif;color:#111;display:flex;align-items:center;justify-content:center;z-index:3}
+  .wm{width:210px;height:110px}
+  .ch{width:190px;height:90px}
+  .safe{position:absolute;left:0;right:0;height:240px;background:rgba(213,40,40,.12);border:0 dashed #d52828;z-index:4}
+  .safe.top{top:0;border-bottom-width:4px}
+  .safe.bot{bottom:0;border-top-width:4px}
+  .mar{position:absolute;left:60px;right:60px;top:240px;bottom:240px;outline:3px dotted rgba(213,40,40,.55);z-index:4;pointer-events:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>AD-004 Roki Gear Close-Up: rough layouts, round 2</h1>
+  <p class="sub">Five takes on Variation 3 (Manga panel). Story 1080 × 1920, about 9s, hard cut on each beat. Every take keeps the black page, the heavy panel border and the fixed logo corners. Beat 4 now carries its own clip, ML-010.</p>
+  <div class="legend">
+    <span><i class="sw" style="background:repeating-linear-gradient(135deg,#c9c9c6 0 3px,#b5b5b1 3px 6px)"></i>Live clip in a panel</span>
+    <span><i class="sw" style="background:#8e8e8b"></i>Frozen frame from an earlier beat</span>
+    <span><i class="sw" style="background:#0c0c0c"></i>On-screen copy</span>
+    <span><i class="sw" style="background:#fff"></i>Logo marks</span>
+    <span><i class="sw" style="background:rgba(213,40,40,.2);border-color:#d52828"></i>240px platform safe area</span>
+  </div>
+</header>
+<main id="out"></main>
+
+<script>
+const CLIPS = {
+  1:{id:'ML-008',file:'00468672',range:'2–5s',desc:'Ippo fight shorts, push-in'},
+  2:{id:'ML-009',file:'00527592',range:'40–45s',desc:'Slayer compression shirt, stretch'},
+  3:{id:'ML-006',file:'00483348',range:'3–5s',desc:'Sendo fight shorts, on the bag'},
+  4:{id:'ML-010',file:'00485364',range:'4–6s',desc:'Roki tee, leg raises'}
+};
+const BEATS = [['Beat 1 · Hook','0–2s'],['Beat 2 · Craft','2–4.5s'],['Beat 3 · Detail','4.5–7s'],['Beat 4 · Close','7–9s']];
+const COPY = {1:"Zoom in. This is what you're training in.",2:'Every seam.',3:'Every detail.'};
+
+const css = o => Object.entries(o).map(([k,v])=>`${k}:${typeof v==='number'?v+'px':v}`).join(';');
+function panel(b,[x,y,w,h],o={}){
+  const c=CLIPS[b], cls=['panel',o.frozen&&'frozen',o.bleed&&'bleed',o.dim&&'dim'].filter(Boolean).join(' ');
+  const rot=o.rot?`transform:rotate(${o.rot}deg);`:'';
+  const tag=o.frozen?'frozen':o.tag||'';
+  return `<div class="${cls}" style="${css({left:x,top:y,width:w,height:h})};${rot}"><div class="lbl">${c.id} · ${c.file} · ${c.range}${tag?' · '+tag:''}<small>${c.desc}</small></div></div>`;
+}
+function copy(text,[x,y],size,o={}){
+  const st={left:x,top:y,'font-size':size,'line-height':'0.98'};
+  if(o.w) st['max-width']=o.w;
+  const rot=o.rot?`;transform:rotate(${o.rot}deg)`:'';
+  return `<div class="t" style="${css(st)}${rot}">${text}</div>`;
+}
+const cta=([x,y])=>`<div class="cta" style="${css({left:x,top:y})}">See the range at rokiovertime.com</div>`;
+const wm=()=>`<div class="wm" style="left:60px;bottom:300px">ロキ roki</div>`;
+const ch=pos=>`<div class="ch" style="right:60px;${pos==='top'?'top:300px':'bottom:310px'}">頂点へ</div>`;
+const guides=`<div class="safe top"></div><div class="safe bot"></div><div class="mar"></div>`;
+
+const VARIANTS = [
+  {name:'3.1 Broken frame', note:'One big panel, tilted a degree or two, with the copy box breaking over its bottom edge the way a manga caption overlaps the art. 頂点へ bottom-right, opposite the wordmark.',
+   beats:[
+     ()=>panel(1,[60,300,960,1060],{rot:-1.5})+copy(COPY[1],[60,1250],60,{w:820,rot:1})+ch('bot'),
+     ()=>panel(2,[60,300,960,1060],{rot:1.5})+copy(COPY[2],[60,1270],84,{rot:-1})+ch('bot'),
+     ()=>panel(3,[60,300,960,1060],{rot:-1.5})+copy(COPY[3],[60,1270],84,{rot:1})+ch('bot'),
+     ()=>panel(4,[60,300,960,860],{rot:1.5})+copy('Roki Overtime',[60,1090],84,{rot:-1})+cta([60,1250])+ch('bot')
+   ]},
+  {name:'3.2 Detail inset', note:'A main panel plus a smaller inset panel that punches in tighter on the same clip, so every beat literally zooms in. Copy sits beside the inset. 頂点へ top-right.',
+   beats:[
+     ()=>panel(1,[60,300,960,800])+panel(1,[540,960,480,460],{tag:'2× punch-in'})+copy(COPY[1],[60,1150],52,{w:440})+ch('top'),
+     ()=>panel(2,[60,300,960,800])+panel(2,[540,960,480,460],{tag:'2× punch-in'})+copy(COPY[2],[60,1180],64,{w:440})+ch('top'),
+     ()=>panel(3,[60,300,960,800])+panel(3,[540,960,480,460],{tag:'2× punch-in'})+copy(COPY[3],[60,1180],64,{w:440})+ch('top'),
+     ()=>panel(4,[60,300,960,800])+copy('Roki Overtime',[60,1160],84)+cta([60,1310])+ch('top')
+   ]},
+  {name:'3.3 Caption inside', note:'One tall panel almost to the wordmark, with the copy set inside it as a caption box top-left, like narration on a manga page. The most image you can get while keeping the panel look. 頂点へ bottom-right.',
+   beats:[
+     ()=>panel(1,[60,300,960,1160])+copy(COPY[1],[100,340],56,{w:760})+ch('bot'),
+     ()=>panel(2,[60,300,960,1160])+copy(COPY[2],[100,340],84)+ch('bot'),
+     ()=>panel(3,[60,300,960,1160])+copy(COPY[3],[100,340],84)+ch('bot'),
+     ()=>panel(4,[60,300,960,1160])+copy('Roki Overtime',[100,340],84)+cta([100,1340])+ch('bot')
+   ]},
+  {name:'3.4 Zoom ladder', note:'The panel grows on every cut, from small and centred to nearly full width, then breaks out to full bleed on the end card. The hook\'s "zoom in" carried by the frame itself. 頂点へ bottom-right throughout.',
+   beats:[
+     ()=>panel(1,[290,560,500,640])+copy(COPY[1],[160,1250],52,{w:760})+ch('bot'),
+     ()=>panel(2,[190,440,700,820])+copy(COPY[2],[190,1300],84)+ch('bot'),
+     ()=>panel(3,[60,300,960,1000])+copy(COPY[3],[60,1330],84)+ch('bot'),
+     ()=>panel(4,[0,0,1080,1920],{bleed:true,dim:true,tag:'full bleed, dimmed'})+copy('Roki Overtime',[60,336],84)+cta([60,470])+ch('bot')
+   ]},
+  {name:'3.5 Page build', note:'Panels stack up into a full manga page. Each beat adds a panel with the live clip, and the earlier panels freeze where they are. The end card is the finished page. Copy sits as a caption box on the corner of the live panel. 頂点へ top-right, CTA beside the wordmark.',
+   beats:[
+     ()=>panel(1,[60,410,960,360])+copy(COPY[1],[40,380],44,{w:760})+ch('top'),
+     ()=>panel(1,[60,410,960,360],{frozen:true})+panel(2,[60,790,470,400])+copy(COPY[2],[40,1110],56)+ch('top'),
+     ()=>panel(1,[60,410,960,360],{frozen:true})+panel(2,[60,790,470,400],{frozen:true})+panel(3,[550,790,470,400])+copy(COPY[3],[530,1110],56)+ch('top'),
+     ()=>panel(1,[60,410,960,360],{frozen:true})+panel(2,[60,790,470,400],{frozen:true})+panel(3,[550,790,470,400],{frozen:true})+panel(4,[60,1210,960,270])+copy('Roki Overtime',[40,1180],56)+cta([300,1540])+ch('top')
+   ]}
+];
+
+document.getElementById('out').innerHTML = VARIANTS.map(v=>`
+<section><h2>${v.name}</h2><p class="sub">${v.note}</p><div class="row">
+${v.beats.map((f,i)=>`<figure><div class="frame"><div class="c">${f()}${wm()}${guides}</div></div><figcaption><b>${BEATS[i][0]}</b> · ${BEATS[i][1]}</figcaption></figure>`).join('')}
+</div></section>`).join('');
+</script>
+</body>
+</html>
