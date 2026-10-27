@@ -1,0 +1,68 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:"Druk Wide";src:url(../assets/fonts/DrukWide-Bold.ttf);font-weight:700}
+@font-face{font-family:"Anime Ace";src:url(../assets/fonts/AnimeAce-Bold.ttf);font-weight:700}
+@font-face{font-family:Poppins;src:url(../assets/fonts/Poppins-400.woff2);font-weight:400}
+@font-face{font-family:Poppins;src:url(../assets/fonts/Poppins-700.woff2);font-weight:700}
+:root{--RokiRed:#8a0000;--signal-red:#d52828;--ink:#080808;--paper:#ffffff;--studio-grey:#e3e6e7;--ink-muted:#5a5a5a;
+--font-display:"Druk Wide","Arial Black",sans-serif;--font-comic:"Anime Ace",cursive;--font-body:Poppins,Arial,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1080px;overflow:hidden}
+body{background:var(--ground);position:relative;font-family:var(--font-body);color:var(--on)}
+.pn{position:absolute;overflow:hidden;outline:var(--pw) solid var(--panel);outline-offset:calc(var(--pw) / -2)}
+.pn>img.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:contrast(1.08) brightness(.96) saturate(.95)}
+.pn .tone{position:absolute;inset:0;background:radial-gradient(circle,rgba(8,8,8,.55) 32%,transparent 36%) 0 0/5px 5px;mix-blend-mode:multiply;opacity:.16;pointer-events:none}
+.pn.text{display:flex;flex-direction:column;justify-content:space-between;padding:36px 40px}
+.pn.text.row{flex-direction:row;align-items:flex-end}
+.screentone{background:var(--paper) radial-gradient(circle,rgba(8,8,8,.9) 30%,transparent 33%) 0 0/9px 9px}
+.speed{background:var(--paper) repeating-linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 26px)}
+.line{font:400 34px/1.3 var(--font-body)}
+.kick{font:700 32px/1.15 var(--font-comic)}
+.price{font:700 64px/.95 var(--font-display);letter-spacing:0}
+.tag{display:inline-block;background:var(--signal-red);color:var(--paper);padding:14px 20px 10px;font:700 56px/1 var(--font-display)}
+.chip{display:inline-block;background:var(--paper);padding:10px 16px}
+.cap{position:absolute;z-index:5;background:var(--cap-bg);color:var(--cap-on);border:3px solid var(--ink);padding:16px 22px 12px;
+font:700 32px/1.02 var(--font-display);letter-spacing:0}
+.hook{font:700 64px/.95 var(--font-display);display:inline-block}
+.hook .acc{color:var(--accent)}
+.end .big{font:700 88px/.92 var(--font-display);letter-spacing:-1px;display:inline-block}
+.end .cta{font:700 28px/1.1 var(--font-body);color:var(--accent);margin-top:16px}
+.end .url{font:400 24px/1.3 var(--font-body);margin-top:8px;opacity:.75}
+.logo{position:absolute;z-index:6}
+#grain{position:absolute;inset:0;z-index:9;pointer-events:none;mix-blend-mode:multiply;opacity:.07}
+#paper{position:absolute;inset:0;z-index:0;pointer-events:none;mix-blend-mode:multiply;opacity:.35}
+.tile-frame{position:absolute;border:3px solid var(--panel);overflow:hidden;background:var(--paper)}
+.tile-frame img{width:100%;height:100%;object-fit:cover;filter:contrast(1.08) brightness(.96)}
+
+.stack{position:absolute;left:60px;top:60px;width:960px;height:880px;display:flex;flex-direction:column;justify-content:space-evenly}
+.row{display:flex;gap:24px;align-items:flex-start;width:100%}
+.cell{position:relative;flex:none}
+.cell>.pn{position:relative;width:100%;height:100%}
+.pn.text{display:block;padding:28px 32px;height:auto!important}
+.pn.text .stackcopy{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.pn.text .inline{display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+.cap{bottom:-30px;left:30px}
+.pn>img.ht{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+.stack{z-index:2}
+.pn{outline:none!important}
+.cell::after{content:"";position:absolute;inset:0;border:8px solid var(--panel);filter:url(#roughf);pointer-events:none;z-index:3}
+.stock{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;z-index:0;opacity:.4}
+.gr{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;z-index:1;pointer-events:none}
+.mark{position:absolute;z-index:1;pointer-events:none}
+#grainA{position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:multiply;opacity:.12}
+body.dark .gr,body.dark .mark{filter:invert(1);mix-blend-mode:screen}
+body.dark #grainA{mix-blend-mode:screen;opacity:.08}
+.chip.price{color:var(--RokiRed)}.end .cta{color:var(--RokiRed)!important}</style></head><body style="--ground:var(--paper);--on:var(--ink);--panel:var(--ink);--pw:8px;--accent:var(--RokiRed);--cap-bg:var(--paper);--cap-on:var(--ink)"><svg width="0" height="0" style="position:absolute"><defs>
+<filter id="grainf" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/>
+<feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .55"/></feComponentTransfer></filter>
+<filter id="paperf" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="3" seed="4" result="n"/>
+<feDiffuseLighting in="n" surfaceScale="2" lighting-color="#fff"><feDistantLight azimuth="235" elevation="58"/></feDiffuseLighting></filter>
+<filter id="rough" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="3" result="n"/>
+<feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg><img class="stock" src="../assets/grunge/paper/cool_0.jpg"><img class="gr" src="../assets/grunge/grunge/dust_1.png" style="opacity:0.4"><img class="mark" src="../assets/grunge/splatter/splat_1_red.png" style="left:850px;top:-130px;width:340px;height:340px;object-fit:contain;opacity:0.85"><div id="grainA" style="filter:url(#grainf)"></div><div class="stack"><div class="row"><div class="cell" style="width:562px;height:330px"><div class="pn"><img class="ph" src="../assets/shirt-1.jpg" style="object-position:50% 50%;"><div class="tone"></div></div><div class="cap" style="max-width:502px">KAMOGAWA BOXING GYM TRAINING SHIRT</div></div><div class="cell" style="width:374px;height:330px"><div class="pn"><img class="ph" src="../assets/shirt-2.jpg" style="object-position:55% 55%;transform:scale(1.4);transform-origin:55% 55%;"><div class="tone"></div></div></div></div><div class="row"><div class="cell" style="width:960px;height:220px"><div class="pn"><img class="ht" src="../assets/ht/shirt-life-sq.png"></div></div></div><div class="row"><div class="cell" style="width:960px"><div class="pn text screentone"><div class="inline"><span class="chip kick">For training days.</span><span class="chip price">$64.95</span></div></div></div></div></div><img class="logo" src="../assets/wordmark-black.png" style="left:60px;top:967px;width:210px"><img class="logo" src="../assets/choten-black.png" style="right:60px;top:972px;width:190px"><svg width="0" height="0" style="position:absolute"><filter id="roughf" x="-2%" y="-2%" width="104%" height="104%">
+<feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="3" seed="11" result="n"/>
+<feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter></svg><div id="grain" style="filter:url(#grainf)"></div><script>
+function fit(el,maxW,lo=40,hi=140){while(hi-lo>1){const m=(lo+hi)>>1;el.style.fontSize=m+'px';el.scrollWidth<=maxW?lo=m:hi=m}el.style.fontSize=lo+'px'}
+document.fonts.ready.then(()=>{document.querySelectorAll('.hook,.end .big').forEach(el=>{const p=el.closest('.pn');
+fit(el,p.clientWidth-64,40,el.classList.contains('big')?88:64)});document.body.dataset.ready=1});
+</script></body></html>

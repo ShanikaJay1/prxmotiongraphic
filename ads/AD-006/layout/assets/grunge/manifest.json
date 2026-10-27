@@ -1,0 +1,210 @@
+{
+ "paper": [
+  {
+   "file": "paper/cool_0.jpg",
+   "size": [
+    1080,
+    1350
+   ],
+   "family": "cool"
+  },
+  {
+   "file": "paper/cool_1.jpg",
+   "size": [
+    1080,
+    1350
+   ],
+   "family": "cool"
+  },
+  {
+   "file": "paper/cool_2.jpg",
+   "size": [
+    1080,
+    1350
+   ],
+   "family": "cool"
+  }
+ ],
+ "brush": [
+  {
+   "file": "brush/stroke_0.png",
+   "size": [
+    1100,
+    220
+   ],
+   "dry": 0.2
+  },
+  {
+   "file": "brush/stroke_1.png",
+   "size": [
+    1100,
+    260
+   ],
+   "dry": 0.4
+  },
+  {
+   "file": "brush/stroke_2.png",
+   "size": [
+    1100,
+    180
+   ],
+   "dry": 0.6
+  },
+  {
+   "file": "brush/stroke_3.png",
+   "size": [
+    1100,
+    300
+   ],
+   "dry": 0.8
+  },
+  {
+   "file": "brush/stroke_4.png",
+   "size": [
+    1100,
+    220
+   ],
+   "dry": 0.5
+  },
+  {
+   "file": "brush/stroke_5.png",
+   "size": [
+    1100,
+    260
+   ],
+   "dry": 0.7
+  },
+  {
+   "file": "brush/stroke_6.png",
+   "size": [
+    1100,
+    180
+   ],
+   "dry": 0.3
+  },
+  {
+   "file": "brush/stroke_7.png",
+   "size": [
+    1100,
+    300
+   ],
+   "dry": 0.9
+  }
+ ],
+ "splatter": [
+  {
+   "file": "splatter/splat_0.png",
+   "size": [
+    1113,
+    713
+   ]
+  },
+  {
+   "file": "splatter/splat_1.png",
+   "size": [
+    1243,
+    938
+   ]
+  },
+  {
+   "file": "splatter/splat_2.png",
+   "size": [
+    1209,
+    1092
+   ]
+  },
+  {
+   "file": "splatter/splat_3.png",
+   "size": [
+    960,
+    843
+   ]
+  },
+  {
+   "file": "splatter/splat_4.png",
+   "size": [
+    1073,
+    1062
+   ]
+  },
+  {
+   "file": "splatter/splat_5.png",
+   "size": [
+    974,
+    1122
+   ]
+  }
+ ],
+ "tape": [
+  {
+   "file": "tape/kraft_0.png",
+   "size": [
+    360,
+    96
+   ],
+   "kind": "kraft"
+  },
+  {
+   "file": "tape/kraft_1.png",
+   "size": [
+    360,
+    96
+   ],
+   "kind": "kraft"
+  },
+  {
+   "file": "tape/masking_0.png",
+   "size": [
+    360,
+    96
+   ],
+   "kind": "masking"
+  },
+  {
+   "file": "tape/masking_1.png",
+   "size": [
+    360,
+    96
+   ],
+   "kind": "masking"
+  }
+ ],
+ "grunge": [
+  {
+   "file": "grunge/dust_0.png",
+   "size": [
+    1080,
+    1350
+   ],
+   "kind": "dust",
+   "blend": "multiply"
+  },
+  {
+   "file": "grunge/dust_1.png",
+   "size": [
+    1080,
+    1350
+   ],
+   "kind": "dust",
+   "blend": "multiply"
+  },
+  {
+   "file": "grunge/edge_0.png",
+   "size": [
+    1080,
+    1350
+   ],
+   "kind": "edge",
+   "blend": "multiply"
+  },
+  {
+   "file": "grunge/edge_1.png",
+   "size": [
+    1080,
+    1350
+   ],
+   "kind": "edge",
+   "blend": "multiply"
+  }
+ ]
+}
