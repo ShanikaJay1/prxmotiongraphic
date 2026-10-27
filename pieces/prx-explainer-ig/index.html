@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRX Explainer (Instagram)</title>
+<style>
+/* ---- Fonts (self-hosted so frame export is deterministic) ---------------- */
+@font-face { font-family: 'Manrope'; font-weight: 700; src: url(../../assets/fonts/manrope-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Manrope'; font-weight: 800; src: url(../../assets/fonts/manrope-latin-800-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 400; src: url(../../assets/fonts/inter-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Momo Trust Display'; font-weight: 400; src: url(../../assets/fonts/momo-trust-display-latin-400-normal.woff2) format('woff2'); }
+
+/* ---- PRX tokens (from the PRX design system) ----------------------------- */
+:root {
+  --dark-1: #120f24; --dark-2: #1c1833;
+  --primary: #753fe4; --secondary: #df9bff;
+  --ink: #ffffff; --on-primary: #f5f5f5;
+  --category-tan: #e6b070;
+  --font-sans: 'Manrope', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-display: 'Momo Trust Display', 'Manrope', system-ui, sans-serif;
+}
+
+html, body { margin: 0; background: #000; }
+body { display: grid; place-items: center; min-height: 100vh; overflow: hidden; }
+
+/* 1080x1920 stage; scaled to fit the window in preview, 1:1 in export.
+   Instagram safe area: text and key elements stay between y 250 and 1600. */
+#stage {
+  position: relative; width: 1080px; height: 1920px; overflow: hidden;
+  background: var(--dark-1); color: var(--ink); font-family: var(--font-body);
+  transform-origin: center center;
+}
+.abs { position: absolute; }
+[data-anim] { will-change: transform, opacity, filter; opacity: 0; }
+
+/* Background */
+#bg-grad { inset: 0; background: url(../../assets/brand/bg-gradient.svg) center / cover no-repeat; }
+#bg-glow {
+  width: 1400px; height: 1400px; left: -160px; top: 260px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(117,63,228,0.35), rgba(117,63,228,0));
+}
+
+/* Type */
+.h1 { font-family: var(--font-sans); font-weight: 800; font-size: 96px; line-height: 1.08; letter-spacing: -2px; margin: 0; }
+.accent { font-family: var(--font-display); font-weight: 400; color: var(--category-tan); letter-spacing: 0; }
+.center { left: 0; right: 0; text-align: center; }
+
+/* 3D product assets */
+.obj img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* Payment card with a light sweep masked to the card's own shape */
+#card { width: 720px; height: 720px; left: 180px; top: 640px; }
+#card img { width: 100%; height: 100%; display: block; }
+#card-sweep {
+  position: absolute; inset: 0;
+  -webkit-mask: url(../../assets/3d/payment-card-1.png) center / contain no-repeat;
+          mask: url(../../assets/3d/payment-card-1.png) center / contain no-repeat;
+  background: linear-gradient(105deg, rgba(255,255,255,0) 38%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 62%);
+  background-size: 300% 100%; background-repeat: no-repeat;
+}
+
+/* End card */
+#end-lockup { width: 760px; left: 160px; top: 561px; }
+#end-lockup img { width: 100%; display: block; }
+#end-cta {
+  left: 50%; top: 1200px; margin-left: -330px; width: 660px; box-sizing: border-box;
+  background: var(--primary); color: var(--on-primary); border-radius: 30px;
+  font-family: var(--font-sans); font-weight: 700; font-size: 44px; text-align: center; padding: 40px 0;
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- Background -->
+  <div class="abs" id="bg-grad" data-anim></div>
+  <div class="abs" id="bg-glow" data-anim></div>
+
+  <!-- Everyday shopping: shared by scenes 1 and 2 -->
+  <div class="abs obj" id="o-coffee" data-anim style="left:40px;top:300px;width:340px;height:340px"><img src="../../assets/3d/coffee.png" alt=""></div>
+  <div class="abs obj" id="o-handbag" data-anim style="left:730px;top:420px;width:300px;height:300px"><img src="../../assets/3d/handbag.png" alt=""></div>
+  <div class="abs obj" id="o-sneakers" data-anim style="left:560px;top:1250px;width:440px;height:440px"><img src="../../assets/3d/sneakers.png" alt=""></div>
+
+  <!-- S1 · Hook -->
+  <p class="abs h1 center" id="s1-l1" data-anim style="top:840px">You could be</p>
+  <p class="abs h1 center" id="s1-l2" data-anim style="top:944px">earning <span class="accent">cashback</span></p>
+
+  <!-- S2 · Payoff -->
+  <p class="abs h1 center" id="s2-l1" data-anim style="top:380px">On the shopping</p>
+  <p class="abs h1 center" id="s2-l2" data-anim style="top:484px">you <span class="accent">already do.</span></p>
+  <div class="abs" id="card" data-anim><img src="../../assets/3d/payment-card-1.png" alt=""><div id="card-sweep"></div></div>
+
+  <!-- S3 · Call to action -->
+  <div class="abs" id="end-lockup" data-anim><img src="../../assets/brand/lockup.png" alt="PRX Vault"></div>
+  <div class="abs" id="end-cta" data-anim>Sign up for free</div>
+</div>
+
+<script>
+/* =========================================================================
+   TIMING CONSTANTS: all values from prx-motion.css (seconds).
+   PX scales the token travel distances (authored for app UI) to the
+   1080px video canvas, about 2x a phone's CSS width.
+   ========================================================================= */
+const EASE = {
+  enter:  [0.16, 1, 0.3, 1],
+  exit:   [0.7, 0, 0.84, 0],
+  move:   [0.76, 0, 0.24, 1],
+  settle: [0.25, 1, 0.5, 1],
+  reveal: [0.86, 0, 0.07, 1],
+  drift:  [0.37, 0, 0.63, 1],
+};
+const DUR = { micro: 0.2, fast: 0.4, base: 0.7, slow: 1.1, hero: 1.6 };
+const STAGGER = { tight: 0.04, base: 0.08, wide: 0.14 };
+const PX = 2;
+const TRAVEL = { sm: 12 * PX, md: 32 * PX, lg: 72 * PX };
+const SCALE_FROM = 0.96;
+const BLUR_FROM = 8;
+const EXIT_RATIO = 0.6;
+
+/* Scene start times (storyboard: 1.5s + 1.7s + 1.8s) */
+const S1 = 0.0, S2 = 1.5, S3 = 3.2;
+const TOTAL = 5.0;
+const FPS = 30;
+const PUSH = S2 - 0.3;      // soft push-in hands scene 1 to scene 2
+const CARD_OUT = S3 - 0.4;  // card scales back to clear space for the end card
+
+/* ---- cubic-bezier solver ------------------------------------------------- */
+function bezier([x1, y1, x2, y2]) {
+  const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+  const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  const sx = t => ((ax * t + bx) * t + cx) * t;
+  const sy = t => ((ay * t + by) * t + cy) * t;
+  const dx = t => (3 * ax * t + 2 * bx) * t + cx;
+  return x => {
+    if (x <= 0) return 0; if (x >= 1) return 1;
+    let t = x;
+    for (let i = 0; i < 8; i++) { const e = sx(t) - x, d = dx(t); if (Math.abs(e) < 1e-6) break; if (Math.abs(d) < 1e-6) break; t -= e / d; }
+    let lo = 0, hi = 1;
+    if (Math.abs(sx(t) - x) > 1e-5) { t = x; while (hi - lo > 1e-6) { if (sx(t) < x) lo = t; else hi = t; t = (lo + hi) / 2; } }
+    return sy(t);
+  };
+}
+const E = Object.fromEntries(Object.entries(EASE).map(([k, v]) => [k, bezier(v)]));
+const prog = (t, start, dur, ease) => ease(Math.min(1, Math.max(0, (t - start) / dur)));
+const lerp = (a, b, p) => a + (b - a) * p;
+
+/* ---- element helpers ----------------------------------------------------- */
+const $ = id => document.getElementById(id);
+function set(el, { o = 1, x = 0, y = 0, s = 1, b = 0, extra = '' }) {
+  el.style.opacity = o.toFixed(4);
+  el.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${s.toFixed(4)}) ${extra}`;
+  el.style.filter = b > 0.01 ? `blur(${b.toFixed(2)}px)` : 'none';
+}
+/* Enter at `a` (duration `d`, curve, travel, optional blur), exit at `z`
+   with ease-exit at 60% of the entrance duration. */
+function beat(el, t, a, z, { d = DUR.base, ease = E.enter, dy = TRAVEL.md, dx = 0, blur = false, scale = true, extra = '' } = {}) {
+  const p = prog(t, a, d, ease);
+  const q = z == null ? 0 : prog(t, z, d * EXIT_RATIO, E.exit);
+  set(el, {
+    o: p * (1 - q),
+    x: (1 - p) * dx - q * dx * 0.5,
+    y: (1 - p) * dy - q * dy * 0.5,
+    s: scale ? lerp(SCALE_FROM, 1, p) * lerp(1, SCALE_FROM, q) : 1,
+    b: blur ? (1 - p) * BLUR_FROM * PX : 0,
+    extra,
+  });
+  return { p, q };
+}
+const text = (el, t, a, z, o = {}) => beat(el, t, a, z, { d: DUR.fast, ease: E.settle, dy: TRAVEL.sm, ...o });
+
+/* Everyday-shopping objects: centre point, depth (parallax weight), float phase */
+const OBJECTS = [
+  { id: 'o-coffee',   cx: 210, cy: 470,  depth: 1.0, phase: 0.0 },
+  { id: 'o-handbag',  cx: 880, cy: 570,  depth: 0.7, phase: 2.1 },
+  { id: 'o-sneakers', cx: 780, cy: 1470, depth: 1.3, phase: 4.2 },
+];
+
+/* ---- the timeline: pure function of t, seekable ------------------------- */
+function render(t) {
+  /* Background: already on screen at frame 0, ambient drift throughout */
+  set($('bg-grad'), { o: lerp(0.6, 0.85, prog(t, 0, TOTAL, E.drift)) });
+  const drift = Math.sin((t / TOTAL) * Math.PI);
+  set($('bg-glow'), { o: 1, x: drift * 80, y: -drift * 60, s: 1 + 0.05 * drift });
+
+  /* Objects: arrive fast (hook), push outward on the hand-off, then settle back
+     to the edges in scene 2 and leave with it */
+  const push = prog(t, PUSH, DUR.base, E.move);
+  const settle = prog(t, S2, DUR.base, E.settle);
+  OBJECTS.forEach(({ id, cx, cy, depth, phase }, i) => {
+    const p = prog(t, S1 + i * STAGGER.tight, DUR.fast, E.enter);
+    const q = prog(t, CARD_OUT, DUR.base * EXIT_RATIO, E.exit);
+    const vx = cx - 540, vy = cy - 960, len = Math.hypot(vx, vy);
+    const out = push * 90 * depth + settle * 220;
+    const float = Math.sin(t * 1.6 + phase) * 10 * depth;
+    set($(id), {
+      o: p * lerp(1, 0.5, settle) * (1 - q),
+      x: (vx / len) * out + (1 - p) * -vx * 0.15,
+      y: (vy / len) * out + (1 - p) * -vy * 0.15 + float,
+      s: lerp(0.8, 1, p) * (1 + 0.08 * push * depth) * lerp(1, 0.84, settle),
+      b: (1 - p) * BLUR_FROM * PX + settle * 3 * depth,
+      extra: `rotate(${Math.sin(t * 0.9 + phase) * 3 * depth}deg)`,
+    });
+  });
+
+  /* S1 · Hook: copy fully set by ~0.75s */
+  const s1z = S2 - 0.2;
+  text($('s1-l1'), t, S1 + 0.3, s1z);
+  text($('s1-l2'), t, S1 + 0.3 + STAGGER.wide, s1z);
+
+  /* S2 · Payoff: card glides to centre, one light sweep, then scales back */
+  const s2z = CARD_OUT;
+  text($('s2-l1'), t, S2 + 0.15, s2z);
+  text($('s2-l2'), t, S2 + 0.15 + STAGGER.wide, s2z);
+  {
+    const p = prog(t, S2 + 0.05, DUR.base, E.enter);
+    const back = prog(t, CARD_OUT, DUR.base, E.move);
+    const fade = prog(t, CARD_OUT + DUR.base * 0.4, DUR.base * EXIT_RATIO, E.exit);
+    const bob = Math.sin((t - S2) * 1.4) * 8 * (1 - back);
+    set($('card'), {
+      o: p * (1 - fade),
+      x: lerp(TRAVEL.lg * 2, 0, p),
+      y: lerp(TRAVEL.lg * 2, 0, p) + bob + lerp(0, -240, back),
+      s: lerp(0.9, 1, p) * lerp(1, 0.55, back),
+      b: (1 - p) * BLUR_FROM,
+      extra: `rotate(${lerp(-10, 0, p)}deg)`,
+    });
+    const sweep = prog(t, S2 + 0.7, DUR.base, E.move);
+    $('card-sweep').style.backgroundPosition = `${lerp(100, 0, sweep).toFixed(2)}% 0`;
+  }
+
+  /* S3 · Call to action: logo settles, CTA fades up, still hold to the end */
+  beat($('end-lockup'), t, S3 - 0.05, null, { d: DUR.slow, dy: TRAVEL.md, blur: true });
+  beat($('end-cta'), t, S3 + 0.4, null, { d: DUR.base, ease: E.settle, dy: TRAVEL.sm });
+}
+
+/* ---- playback / export hooks -------------------------------------------- */
+window.PRX_TIMELINE = { TOTAL, FPS, render };
+window.seek = t => render(t);
+
+function fit() {
+  if (new URLSearchParams(location.search).has('export')) return;
+  const s = Math.min(innerWidth / 1080, innerHeight / 1920);
+  $('stage').style.transform = `scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+if (!new URLSearchParams(location.search).has('export')) {
+  let t0 = null;
+  const loop = now => { if (t0 == null) t0 = now; render(((now - t0) / 1000) % (TOTAL + 1)); requestAnimationFrame(loop); };
+  document.fonts.ready.then(() => requestAnimationFrame(loop));
+} else {
+  render(0);
+}
+</script>
+</body>
+</html>

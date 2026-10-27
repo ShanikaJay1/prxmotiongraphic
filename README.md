@@ -38,3 +38,20 @@ Everything is synthesised; there are no samples and no licensing to clear. It fo
 | 25s | A swell into the end card, then a warm hit and a D-major bell resolve. |
 
 The hits carry upper harmonics so they still read on phone speakers.
+
+## Pieces
+
+Each further motion piece lives in `pieces/<name>/` with its own `index.html`, `sound.py` and `out/`, and shares `assets/` and `scripts/render.mjs`.
+
+### PRX explainer (Instagram)
+
+A 5-second, 1080×1920 standalone piece: "You could be earning cashback" → "On the shopping you already do." → the PRX lockup and "Sign up for free".
+
+```bash
+D=pieces/prx-explainer-ig/out
+python3 pieces/prx-explainer-ig/sound.py $D/prx-explainer-ig-sound.wav
+node scripts/render.mjs --page pieces/prx-explainer-ig/index.html $D/prx-explainer-ig-silent.mp4
+ffmpeg -i $D/prx-explainer-ig-silent.mp4 -i $D/prx-explainer-ig-sound.wav \
+  -af loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000 -c:v copy -c:a aac -b:a 192k -shortest $D/prx-explainer-ig.mp4
+node scripts/render.mjs --page pieces/prx-explainer-ig/index.html --stills 0.8,2.3,4.5   # PNGs into $D
+```
