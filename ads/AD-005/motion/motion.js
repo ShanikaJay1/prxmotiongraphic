@@ -36,11 +36,11 @@ const add = (el, t, fx, o = {}) => el && tracks.push(Object.assign({ el, t, fx }
   pn.forEach((e, i) => { const t = (3 + i * 0.5) * B; add(e, t, "cut"); add(poly[i], t, "cut"); add(cb[i], t + 0.25 * B, "stamp");
     add($("img", e), t, "push", { end: 9 * B, amt: 0.05 }); }); }
 
-// 3 · Value
-{ const mk = $$(".mk", S3), ln = $$(".hx .ln", S3), pn = $$(".pn", S3), poly = $$("svg.strokes polygon", S3), sfx = $$("svg.sfx", S3);
-  add(mk[0], 9 * B, "on"); add(ln[0], 9 * B, "stamp"); add(ln[1], 9.5 * B, "stamp");
-  add(mk[1], 10 * B, "wipe", { steps: 5, dur: 0.21 });
-  pn.forEach((e, i) => { const t = (10.5 + i * 0.25) * B; add(e, t, "cut"); add(poly[i], t, "cut"); add($("img", e), t, "push", { end: 16 * B, amt: 0.04 }); });
+// 3 · Value: slices cut in on the half beat with their name captions, then PAID x3 and FREE
+{ const mk = $$(".mk", S3), pn = $$(".pn", S3), poly = $$("svg.strokes polygon", S3), nm = $$(".cbox", S3), sfx = $$("svg.sfx", S3);
+  add(mk[0], 9 * B, "on");
+  pn.forEach((e, i) => { const t = (9 + i * 0.5) * B; add(e, t, "cut"); add(poly[i], t, "cut"); add(nm[i], t + 0.25 * B, "stamp");
+    add($("img", e), t, "push", { end: 16 * B, amt: 0.04 }); });
   sfx.forEach((e, i) => add(e, [11.5, 12, 12.5, 13][i] * B, "stamp", { big: i === 3 })); }
 const HIT = 13 * B;              // FREE lands: impact frame + shake
 

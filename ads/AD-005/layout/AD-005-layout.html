@@ -52,6 +52,7 @@
   .acc { color:var(--RokiRed); }
   .cbox { position:absolute; background:var(--paper); border:var(--border-frame) solid var(--ink); padding:12px 16px 10px;
           font:700 28px/1 var(--font-comic); color:var(--ink); white-space:nowrap; text-transform:uppercase; }
+  .cbox.nm { font-size:24px; padding:10px 12px 8px; }
   .cap { font:400 30px/1.3 var(--font-body); }
   .offer { font:700 74px/0.95 var(--font-display); color:var(--promo-yellow); text-transform:uppercase; text-align:center; filter:url(#rough); }
   .bar { position:absolute; left:60px; right:60px; background:var(--signal-red); color:var(--paper); display:flex; align-items:center; justify-content:center;
@@ -121,16 +122,18 @@
 
 <!-- 3 · The value: headline first, four slice panels, speech bubbles -->
 <section class="screen" id="s3">
-  <div class="mk" style="left:0;top:560px;width:1080px;height:1000px;opacity:.1;-webkit-mask-image:url(g/dot_15_10_linear.png);mask-image:url(g/dot_15_10_linear.png)"></div>
-  <div class="abs hx" style="left:60px;top:336px;width:960px;font-size:96px">4 pairs for<br>$89.97</div>
-  <div class="mk" style="--mark:var(--signal-red);left:-40px;top:524px;width:1160px;height:56px;-webkit-mask-image:url(g/stroke_3.png);mask-image:url(g/stroke_3.png)"></div>
-  <div class="pn" style="clip-path:polygon(60px 620px,290px 620px,270px 1420px,60px 1420px)"><img src="img/kamogawa.jpg" alt="Kamogawa" style="left:60px;top:620px;width:230px;height:800px;object-position:40% 50%"></div>
-  <div class="pn" style="clip-path:polygon(310px 620px,540px 620px,520px 1420px,290px 1420px)"><img src="img/gomu-03.jpg" alt="Gomu" style="left:290px;top:620px;width:250px;height:800px;object-position:50% 50%"></div>
-  <div class="pn" style="clip-path:polygon(560px 620px,790px 620px,770px 1420px,540px 1420px)"><img src="img/sendo-03.jpg" alt="Sendo" style="left:540px;top:620px;width:250px;height:800px;object-position:45% 50%"></div>
-  <div class="pn" style="clip-path:polygon(810px 620px,1020px 620px,1020px 1420px,790px 1420px)"><img src="img/dragon.jpg" alt="Dragon" style="left:790px;top:620px;width:230px;height:800px;object-position:55% 50%"></div>
+  <div class="mk" style="left:0;top:340px;width:1080px;height:1220px;opacity:.1;-webkit-mask-image:url(g/dot_15_10_linear.png);mask-image:url(g/dot_15_10_linear.png)"></div>
+  <div class="pn" style="clip-path:polygon(60px 400px,290px 400px,270px 1420px,60px 1420px)"><img src="img/kamogawa.jpg" alt="Kamogawa" style="left:60px;top:400px;width:230px;height:1020px;object-position:40% 50%"></div>
+  <div class="pn" style="clip-path:polygon(310px 400px,540px 400px,520px 1420px,290px 1420px)"><img src="img/gomu-03.jpg" alt="Gomu" style="left:290px;top:400px;width:250px;height:1020px;object-position:50% 50%"></div>
+  <div class="pn" style="clip-path:polygon(560px 400px,790px 400px,770px 1420px,540px 1420px)"><img src="img/sendo-03.jpg" alt="Sendo" style="left:540px;top:400px;width:250px;height:1020px;object-position:45% 50%"></div>
+  <div class="pn" style="clip-path:polygon(810px 400px,1020px 400px,1020px 1420px,790px 1420px)"><img src="img/dragon.jpg" alt="Dragon" style="left:790px;top:400px;width:230px;height:1020px;object-position:55% 50%"></div>
   <svg class="strokes" viewBox="0 0 1080 1920"><g fill="none" stroke="#080808" stroke-width="8" stroke-linejoin="miter">
-    <polygon points="60,620 290,620 270,1420 60,1420"/><polygon points="310,620 540,620 520,1420 290,1420"/>
-    <polygon points="560,620 790,620 770,1420 540,1420"/><polygon points="810,620 1020,620 1020,1420 790,1420"/></g></svg>
+    <polygon points="60,400 290,400 270,1420 60,1420"/><polygon points="310,400 540,400 520,1420 290,1420"/>
+    <polygon points="560,400 790,400 770,1420 540,1420"/><polygon points="810,400 1020,400 1020,1420 790,1420"/></g></svg>
+  <div class="cbox nm" style="left:66px;top:372px">Kamogawa</div>
+  <div class="cbox nm" style="left:316px;top:372px">Gomu</div>
+  <div class="cbox nm" style="left:566px;top:372px">Sendo</div>
+  <div class="cbox nm" style="left:816px;top:372px">Dragon</div>
   <svg class="sfx" data-text="PAID" style="left:75px;top:730px" width="190" height="190"></svg>
   <svg class="sfx" data-text="PAID" style="left:325px;top:930px" width="190" height="190"></svg>
   <svg class="sfx" data-text="PAID" style="left:575px;top:1130px" width="190" height="190"></svg>

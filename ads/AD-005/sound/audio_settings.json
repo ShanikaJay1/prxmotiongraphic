@@ -106,42 +106,24 @@
   },
   {
    "t": 6.2083,
-   "fx": "stamp",
-   "gain": 1.0,
+   "fx": "tick",
+   "gain": 0.55,
    "align": "start"
   },
   {
    "t": 6.5417,
-   "fx": "stamp",
-   "gain": 1.0,
+   "fx": "tick",
+   "gain": 0.55,
    "align": "start"
   },
   {
    "t": 6.875,
-   "fx": "whoosh_short",
-   "gain": 0.25,
+   "fx": "tick",
+   "gain": 0.55,
    "align": "start"
   },
   {
    "t": 7.2083,
-   "fx": "tick",
-   "gain": 0.55,
-   "align": "start"
-  },
-  {
-   "t": 7.375,
-   "fx": "tick",
-   "gain": 0.55,
-   "align": "start"
-  },
-  {
-   "t": 7.5833,
-   "fx": "tick",
-   "gain": 0.55,
-   "align": "start"
-  },
-  {
-   "t": 7.75,
    "fx": "tick",
    "gain": 0.55,
    "align": "start"

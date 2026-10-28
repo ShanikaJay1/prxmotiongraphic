@@ -67,9 +67,7 @@ for i in range(2): cue(.75 * B + i * .125 * B, "tick", .5)        # tape
 cue(1 * B, "stamp", 1.0); cue(1.5 * B, "stamp", 1.0); cue(2 * B, "pop", .6)   # headline lines, "3." punch
 for tc in (3 * B, 9 * B, 16 * B): cue(tc, "whoosh", .32, "end")    # scene cuts
 for i in range(5): cue((3 + i * .5) * B, "tick", .65)               # showcase panels
-cue(9 * B, "stamp", 1.0); cue(9.5 * B, "stamp", 1.0)                 # value headline
-cue(10 * B, "whoosh_short", .25)                                   # brush bar
-for i in range(4): cue((10.5 + i * .25) * B, "tick", .55)          # slices
+for i in range(4): cue((9 + i * .5) * B, "tick", .55)             # value slices cut in (names ride with them)
 for k in (11.5, 12, 12.5): cue(k * B, "pop", .65)                  # PAID x3
 cue(13 * B, "impact", .85)                                         # FREE, on the drop
 cue(16.5 * B, "stamp", .9); cue(17 * B, "stamp", 1.0); cue(17.5 * B, "tick", .6); cue(18 * B, "stamp", 1.0)   # close

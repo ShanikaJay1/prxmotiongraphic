@@ -4,7 +4,7 @@ Approved branded layout (C1 collage direction, revised), Story 1080×1920, four 
 
 1. Hook: taped collage, "4 pairs. Pay for 3."
 2. Showcase: manga page with all five active hand wraps (Kamogawa, Gomu, Grappler, Sendo, Dragon)
-3. Value: "4 pairs for $89.97", four slice panels, PAID ×3 and FREE circle bubbles
+3. Value: four slice panels with name captions (Kamogawa, Gomu, Sendo, Dragon), PAID ×3 and FREE circle bubbles. No prices are shown anywhere: Shan removed them for currency reasons on 28 Oct 2026, breaking the offer rule on bundle totals for this ad only.
 4. Offer and close: 頂点へ brush mark, splash panel, offer line, dates, CTA bar
 
 - `AD-005-layout.html`: source for all four screens (one `<section>` per scene)
