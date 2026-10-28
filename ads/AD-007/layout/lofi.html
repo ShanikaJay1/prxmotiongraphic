@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AD-007 Low-fi</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; font-family: Arial, Helvetica, sans-serif; }
+  .ad { position: relative; width: 1080px; height: 1920px; background: #fafafa; overflow: hidden; }
+  .safe { position: absolute; left: 0; right: 0; height: 240px; background: repeating-linear-gradient(45deg, #eee 0 12px, #f6f6f6 12px 24px); }
+  .safe span { position: absolute; left: 60px; top: 50%; transform: translateY(-50%); font-size: 22px; color: #aaa; letter-spacing: 2px; }
+  .margin { position: absolute; left: 60px; right: 60px; top: 240px; bottom: 240px; outline: 2px dashed #e0a0a0; }
+  .b { position: absolute; display: flex; flex-direction: column; justify-content: center; padding: 14px 18px; font-size: 24px; line-height: 1.25; color: #333; }
+  .photo { background: #cfcfcf; border: 3px solid #fff; outline: 2px solid #999; align-items: center; text-align: center; color: #555; }
+  .photo::before, .photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top right, transparent calc(50% - 1px), #aaa 50%, transparent calc(50% + 1px)); }
+  .photo::after { background: linear-gradient(to top left, transparent calc(50% - 1px), #aaa 50%, transparent calc(50% + 1px)); }
+  .photo b { position: relative; z-index: 1; background: #cfcfcf; padding: 4px 8px; font-size: 26px; }
+  .hook { font-size: 58px; font-weight: 900; line-height: 1; color: #111; padding: 0; text-transform: uppercase; }
+  .quote { background: #fff; border: 3px solid #222; font-size: 25px; }
+  .quote i { display: block; margin-top: 8px; font-style: normal; font-size: 20px; color: #777; }
+  .badge { background: #fff; border: 3px solid #222; border-radius: 50%; align-items: center; text-align: center; font-weight: 700; font-size: 34px; padding: 0; }
+  .badge small { font-size: 18px; font-weight: 400; color: #666; }
+  .item { background: #eee; border: 2px solid #888; font-size: 22px; }
+  .item strong { font-size: 24px; }
+  .logo { background: #e6e6e6; border: 2px dashed #888; align-items: center; text-align: center; font-size: 22px; color: #666; }
+  .cta { font-size: 30px; font-weight: 700; padding: 0; color: #111; }
+  .tag { position: absolute; top: 10px; left: 10px; font-size: 18px; color: #999; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const Q1 = ['"great fabric, big pockets, comfortable, good design. 10/10"', 'Gabriel B. · Verified buyer · 5 stars'];
+const Q2 = ['"Really good quality shirt, solid materials, would double up and buy another tbh, they killed it on this one"', 'Kyle · Verified buyer · 5 stars'];
+const Q3 = ['"The shirt print and fabric is amazing, will be getting more for sure!"', 'Harrison H. · Verified buyer · 5 stars'];
+const ITEMS = [['The Grappler Joggers', '$67.99 · 4.8 stars'], ['Kamogawa Training Shirt', '$64.95 · 4.3 stars'], ['Pump covers', '$64.95'], ['Hand wraps', '$29.99']];
+const HOOK = "We didn't write any of this. Our customers did.";
+const P = { hero: '1 Pump cover (hero)', jog: '2 Joggers, cage', gwrap: '3 Grappler wrap', kwrap: '4 Kamogawa wraps', shirt: '5 Shirt, model' };
+
+const photo = (x, y, w, h, k) => ({ t: 'photo', x, y, w, h, html: `<b>${P[k]}</b>` });
+const quote = (x, y, w, h, q) => ({ t: 'quote', x, y, w, h, html: `${q[0]}<i>${q[1]}</i>` });
+const hook = (x, y, w, h) => ({ t: 'hook', x, y, w, h, html: HOOK });
+const badge = (x, y, d) => ({ t: 'badge', x, y, w: d, h: d, html: `4.6 stars<small>from 93 reviews</small>` });
+const item = (x, y, w, h, i) => ({ t: 'item', x, y, w, h, html: `<strong>${ITEMS[i][0]}</strong>${ITEMS[i][1]}` });
+const strip = (y, h = 80) => [0, 1, 2, 3].map(i => item(60 + i * 245, y, 225, h, i));
+// Story frame: content lives between y 240 and 1680. Wordmark bottom-left, 頂点へ top-right, bare CTA bottom-right.
+const corners = () => [
+  { t: 'logo', x: 60, y: 1580, w: 210, h: 100, html: 'ロキ roki wordmark' },
+  { t: 'logo', x: 830, y: 300, w: 190, h: 100, html: '頂点へ mark' },
+];
+const cta = () => ({ t: 'cta', x: 560, y: 1605, w: 460, h: 50, html: '<span style="text-align:right">SHOP NOW · rokiovertime.com</span>' });
+
+const V = {
+  'A · Collage band': [
+    hook(60, 336, 740, 200),
+    photo(60, 570, 600, 600, 'hero'), photo(600, 590, 420, 290, 'jog'), photo(640, 900, 380, 250, 'shirt'),
+    photo(90, 1110, 250, 190, 'gwrap'), photo(370, 1130, 250, 170, 'kwrap'),
+    badge(470, 500, 170),
+    quote(560, 1170, 460, 130, Q3), quote(60, 1310, 520, 150, Q2), quote(560, 1320, 460, 140, Q1),
+    ...strip(1480), cta(), ...corners(),
+  ],
+  'B · Full-bleed hero': [
+    photo(0, 0, 1080, 1920, 'hero'),
+    hook(60, 336, 740, 200),
+    quote(60, 600, 600, 150, Q1), quote(360, 780, 660, 170, Q2), quote(120, 980, 600, 140, Q3),
+    badge(800, 580, 180),
+    photo(60, 1160, 225, 230, 'jog'), photo(305, 1160, 225, 230, 'shirt'), photo(550, 1160, 225, 230, 'kwrap'), photo(795, 1160, 225, 230, 'gwrap'),
+    ...strip(1400), cta(), ...corners(),
+  ],
+  'C · Review wall': [
+    hook(60, 336, 740, 200),
+    photo(-40, 580, 360, 400, 'hero'), photo(760, 600, 360, 360, 'jog'),
+    quote(200, 600, 620, 170, Q1), quote(260, 800, 620, 190, Q2), quote(200, 1020, 620, 150, Q3),
+    photo(-30, 1190, 300, 200, 'shirt'), photo(800, 990, 310, 240, 'gwrap'), photo(380, 1200, 300, 180, 'kwrap'),
+    badge(720, 1220, 160),
+    ...strip(1410), cta(), ...corners(),
+  ],
+  'D · Split column': [
+    hook(60, 336, 740, 200),
+    photo(60, 570, 470, 480, 'hero'), photo(110, 1000, 420, 260, 'jog'), photo(60, 1220, 280, 180, 'gwrap'), photo(320, 1230, 230, 170, 'kwrap'),
+    photo(560, 570, 460, 280, 'shirt'),
+    quote(560, 870, 460, 160, Q1), quote(560, 1050, 460, 190, Q2), quote(560, 1260, 460, 140, Q3),
+    badge(420, 500, 150),
+    ...strip(1430), cta(), ...corners(),
+  ],
+  'E · Product tiles': [
+    hook(60, 336, 740, 200),
+    badge(840, 430, 160),
+    photo(60, 580, 470, 330, 'jog'), quote(90, 860, 420, 140, Q1),
+    photo(560, 600, 460, 320, 'shirt'), quote(590, 860, 420, 190, Q2),
+    photo(60, 1040, 470, 300, 'hero'), quote(90, 1300, 420, 140, Q3),
+    photo(560, 1100, 220, 250, 'gwrap'), photo(800, 1080, 220, 270, 'kwrap'),
+    ...strip(1480), cta(), ...corners(),
+  ],
+};
+
+const variant = new URLSearchParams(location.search).get('v');
+const root = document.getElementById('root');
+for (const [name, boxes] of Object.entries(V)) {
+  if (variant && !name.startsWith(variant)) continue;
+  const ad = document.createElement('div');
+  ad.className = 'ad';
+  ad.innerHTML = `<div class="safe" style="top:0"><span>STORY SAFE AREA</span></div><div class="safe" style="bottom:0"><span>STORY SAFE AREA</span></div><div class="margin"></div>` +
+    boxes.map(b => `<div class="b ${b.t}" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px">${b.html}</div>`).join('') +
+    `<div class="tag">${name}</div>`;
+  root.appendChild(ad);
+}
+</script>
+</body>
+</html>
