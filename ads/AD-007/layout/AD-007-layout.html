@@ -15,47 +15,62 @@
     --ink: #080808;
     --paper: #ffffff;
     --ink-muted: #5a5a5a;
-    --space-3: 60px;
     --border-frame: 3px;
     --font-display: "Druk Wide", "Arial Black", sans-serif;
     --font-comic: "Anime Ace", "Comic Sans MS", cursive;
     --font-body: Poppins, "Helvetica Neue", Arial, sans-serif;
+    --tilt: -2deg;           /* the one tilt; everything else is 0 */
   }
 
   * { box-sizing: border-box; margin: 0; }
   body { background: var(--ink); }
   .ad { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); }
   .layer { position: absolute; inset: 0; }
+  canvas.layer { width: 1080px; height: 1920px; }
 
-  /* Hero: full-bleed, house finish (graded down, crushed blacks, fine screen tone) */
-  .hero { background: url("assets/hero-pumpcover.jpg") -17px 0 / auto 2200px no-repeat; filter: contrast(1.12) brightness(.78) saturate(.9); }
-  .shade { background: var(--ink); opacity: .32; }
-  .tone { background: radial-gradient(circle, var(--ink) 34%, transparent 38%) 0 0 / 5px 5px; opacity: .22; mix-blend-mode: multiply; }
+  /* Background: Tier C halftone plate of the cage shot, paper dots on ink */
+  .bg-dim { background: var(--ink); opacity: .36; }
+  .edge { background: url("assets/grunge/edge_0.png") center / 100% 100%; opacity: .9; }
+  .scratch { background: url("assets/grunge/scratch_0.png") center / cover; filter: invert(1); mix-blend-mode: screen; opacity: .18; }
 
-  .hook { position: absolute; left: 60px; top: 336px; width: 470px; font: 700 50px/0.98 var(--font-display); color: var(--paper); text-transform: uppercase; }
-  .hook em { font-style: normal; color: var(--signal-red); }
+  /* Hook: three lines, fitted by measurement */
+  .hook { position: absolute; left: 60px; top: 336px; width: 760px; color: var(--paper); font-family: var(--font-display); font-weight: 700; line-height: .98; text-transform: uppercase; filter: url(#rough); }
+  .hook span { display: block; white-space: nowrap; width: max-content; }
+  .hook .hit { position: relative; z-index: 0; }
+  .hook .hit::before { content: ""; position: absolute; z-index: -1; left: -20px; right: -28px; top: -16px; bottom: -20px; background: var(--signal-red);
+    -webkit-mask: url("assets/grunge/stroke_2.png") center / 100% 100%; mask: url("assets/grunge/stroke_2.png") center / 100% 100%; }
 
-  .quote { position: absolute; background: var(--paper); border: var(--border-frame) solid var(--ink); padding: 22px 26px 20px; color: var(--ink); }
+  /* Review panels: torn paper with a hard ink shadow */
+  .panel { position: absolute; filter: drop-shadow(8px 8px 0 var(--ink)); }
+  .panel.tilt { transform: rotate(var(--tilt)); }
+  .quote { position: relative; background: var(--paper) url("assets/grunge/cream_0.jpg") center / cover; background-blend-mode: multiply; padding: 30px 30px 30px; color: var(--ink); }
   .quote p { font: 400 28px/1.3 var(--font-body); }
   .quote .by { display: flex; align-items: center; gap: 12px; margin-top: 14px; font: 700 21px/1 var(--font-body); }
   .quote .by span { font-weight: 400; color: var(--ink-muted); }
   .stars { display: inline-flex; gap: 3px; }
   .stars svg { width: 22px; height: 22px; fill: var(--signal-red); }
 
-  .badge { position: absolute; background: var(--signal-red); color: var(--paper); padding: 18px 22px 16px; text-align: center; }
-  .badge b { display: block; font: 700 64px/1 var(--font-display); }
+  .tape { position: absolute; width: 170px; height: 46px; background: url("assets/grunge/masking_0.png") center / 100% 100%; opacity: .92; }
+
+  /* Rating stamp */
+  .splat { position: absolute; background: var(--signal-red); -webkit-mask: url("assets/grunge/splat_1.png") center / 100% 100%; mask: url("assets/grunge/splat_1.png") center / 100% 100%; opacity: .85; }
+  .badge { position: absolute; background: var(--signal-red); color: var(--paper); padding: 20px 22px 18px; text-align: center; transform: rotate(var(--tilt)); filter: url(#roughSoft) drop-shadow(8px 8px 0 var(--ink)); }
+  .badge b { display: block; font: 700 70px/1 var(--font-display); }
   .badge .stars svg { fill: var(--paper); width: 24px; height: 24px; }
   .badge small { display: block; margin-top: 10px; font: 700 20px/1.1 var(--font-comic); letter-spacing: .5px; }
 
-  .thumb { position: absolute; border: var(--border-frame) solid var(--paper); background: var(--ink) center / cover no-repeat; filter: contrast(1.08) brightness(.92); }
+  /* Product photos: paper-framed, overlapped, offset */
+  .thumb { position: absolute; border: 6px solid var(--paper); background: var(--ink) center / cover no-repeat; filter: drop-shadow(8px 8px 0 var(--ink)); }
+  .thumb.tilt { transform: rotate(var(--tilt)); }
 
   .wordmark { position: absolute; left: 60px; bottom: 300px; width: 210px; }
   .choten { position: absolute; right: 60px; top: 300px; width: 190px; }
-  .cta { position: absolute; right: 60px; bottom: 312px; text-align: right; color: var(--paper); }
+  .cta { position: absolute; right: 60px; bottom: 306px; text-align: right; color: var(--paper); }
   .cta b { display: block; font: 700 34px/1 var(--font-body); letter-spacing: 1px; }
   .cta span { display: block; margin-top: 8px; font: 400 22px/1 var(--font-body); }
 
-  .grain { filter: url(#grain); mix-blend-mode: overlay; opacity: .16; }
+  .grainA { filter: url(#grain); mix-blend-mode: overlay; opacity: .22; }
+  .grainB { filter: url(#grain); mix-blend-mode: overlay; opacity: .07; }
 </style>
 </head>
 <body>
@@ -64,50 +79,133 @@
     <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7"/>
     <feColorMatrix type="saturate" values="0"/>
   </filter>
+  <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="roughSoft" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="9" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
   <symbol id="star" viewBox="0 0 24 24"><path d="M12 1.6l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.7l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z"/></symbol>
 </svg>
 
 <div class="ad" id="ad">
-  <div class="layer hero"></div>
-  <div class="layer shade"></div>
-  <div class="layer tone"></div>
+  <canvas class="layer" id="plate" width="1080" height="1920"></canvas>
+  <div class="layer bg-dim"></div>
+  <div class="layer scratch"></div>
+  <div class="layer edge"></div>
+  <div class="layer grainA"></div>
 
-  <h1 class="hook">We didn't write any of this. Our <em>customers</em> did.</h1>
+  <h1 class="hook" id="hook">
+    <span>We didn't write</span>
+    <span>any of this. Our</span>
+    <span><b class="hit">customers</b> did.</span>
+  </h1>
   <img class="choten" src="assets/choten-block-white.png" alt="頂点へ">
 
-  <div class="quote" style="left:60px;top:640px;width:470px">
-    <p>"great fabric, big pockets, comfortable, good design. 10/10"</p>
-    <div class="by">Gabriel B. <span>Verified buyer</span> <i class="stars" data-n="5"></i></div>
+  <div class="panel tilt" style="left:60px;top:584px;width:520px">
+    <div class="quote torn">
+      <p>"great fabric, big pockets, comfortable, good design. 10/10"</p>
+      <div class="by">Gabriel B. <span>Verified buyer</span> <i class="stars" data-n="5"></i></div>
+    </div>
   </div>
-  <div class="quote" style="left:340px;top:930px;width:680px">
-    <p>"Really good quality shirt, solid materials, would double up and buy another tbh, they killed it on this one"</p>
-    <div class="by">Kyle <span>Verified buyer</span> <i class="stars" data-n="5"></i></div>
-  </div>
-  <div class="quote" style="left:60px;top:1150px;width:640px">
-    <p>"The shirt print and fabric is amazing, will be getting more for sure!"</p>
-    <div class="by">Harrison H. <span>Verified buyer</span> <i class="stars" data-n="5"></i></div>
+  <div class="tape" style="left:6px;top:556px;transform:rotate(-24deg)"></div>
+
+  <div class="panel" style="left:330px;top:800px;width:690px">
+    <div class="quote torn">
+      <p>"Really good quality shirt, solid materials, would double up and buy another tbh, they killed it on this one"</p>
+      <div class="by">Kyle <span>Verified buyer</span> <i class="stars" data-n="5"></i></div>
+    </div>
   </div>
 
-  <div class="badge" style="left:752px;top:1150px;width:268px">
+  <div class="panel tilt" style="left:60px;top:1040px;width:620px">
+    <div class="quote torn">
+      <p>"The shirt print and fabric is amazing, will be getting more for sure!"</p>
+      <div class="by">Harrison H. <span>Verified buyer</span> <i class="stars" data-n="5"></i></div>
+    </div>
+  </div>
+
+  <div class="splat" style="left:700px;top:960px;width:380px;height:380px"></div>
+  <div class="badge" style="left:752px;top:1048px;width:268px">
     <b>4.6</b>
     <i class="stars" data-n="5" style="margin-top:8px"></i>
     <small>FROM 93 REVIEWS</small>
   </div>
 
-  <div class="thumb" style="left:60px;top:1350px;width:236px;height:190px;background-image:url(assets/thumb-joggers.jpg);background-position:50% 52%;filter:contrast(1.05) brightness(1.2)"></div>
-  <div class="thumb" style="left:296px;top:1372px;width:236px;height:168px;background-image:url(assets/thumb-shirt.jpg);background-position:50% 35%"></div>
-  <div class="thumb" style="left:532px;top:1338px;width:236px;height:202px;background-image:url(assets/thumb-kwraps.jpg)"></div>
-  <div class="thumb" style="left:768px;top:1362px;width:252px;height:178px;background-image:url(assets/thumb-gwrap.jpg)"></div>
+  <div class="thumb tilt" style="left:60px;top:1290px;width:250px;height:250px;background-image:url(assets/thumb-pumpcover.jpg);background-position:50% 40%"></div>
+  <div class="thumb" style="left:292px;top:1316px;width:250px;height:226px;background-image:url(assets/thumb-shirt-back.jpg);background-position:50% 45%"></div>
+  <div class="thumb tilt" style="left:524px;top:1286px;width:250px;height:254px;background-image:url(assets/thumb-kwraps.jpg)"></div>
+  <div class="thumb" style="left:770px;top:1308px;width:250px;height:232px;background-image:url(assets/thumb-gwrap.jpg)"></div>
+  <div class="tape" style="left:690px;top:1272px;width:150px;height:40px;background-image:url(assets/grunge/masking_1.png);transform:rotate(-24deg)"></div>
 
   <img class="wordmark" src="assets/roki-wordmark-white.png" alt="ロキ roki">
   <div class="cta"><b>SHOP NOW</b><span>rokiovertime.com</span></div>
 
-  <div class="layer grain"></div>
+  <div class="layer grainB"></div>
 </div>
 
 <script>
+  // Seeded random so every render is identical
+  function rnd(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+
+  // Stars
   const star = '<svg><use href="#star"/></svg>';
   document.querySelectorAll('.stars').forEach(s => { s.innerHTML = star.repeat(+s.dataset.n); });
+
+  // Torn top and bottom edges on the review panels
+  document.querySelectorAll('.torn').forEach((el, i) => {
+    const r = rnd(41 + i * 17), w = el.offsetWidth, h = el.offsetHeight, n = 46, pts = [];
+    for (let k = 0; k <= n; k++) pts.push(`${(k / n * w).toFixed(1)}px ${(r() * 7).toFixed(1)}px`);
+    for (let k = n; k >= 0; k--) pts.push(`${(k / n * w).toFixed(1)}px ${(h - r() * 9).toFixed(1)}px`);
+    el.style.clipPath = `polygon(${pts.join(',')})`;
+  });
+
+  // Fit the hook: three lines, widest line fills the column
+  function fitHook() {
+    const el = document.getElementById('hook'), maxW = 740; let lo = 30, hi = 90;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; el.style.fontSize = m + 'px';
+      const wide = Math.max(...[...el.children].map(s => s.getBoundingClientRect().width)); wide <= maxW ? lo = m : hi = m; }
+    el.style.fontSize = lo + 'px';
+  }
+
+  // Background plate: levelled cage shot, 5 px halftone in paper on ink (Tier C)
+  function levels(d, W, H, target = 0.5) {
+    const L = new Float32Array(W * H);
+    for (let k = 0; k < W * H; k++) L[k] = (.299 * d[k*4] + .587 * d[k*4+1] + .114 * d[k*4+2]) / 255;
+    const s = Float32Array.from(L).sort(), a = s[(W*H*.02)|0], b = s[(W*H*.98)|0]; let m = 0;
+    for (let k = 0; k < W * H; k++) { L[k] = Math.min(1, Math.max(0, (L[k] - a) / (b - a + 1e-6))); m += L[k]; }
+    m /= W * H; const g = Math.log(target) / Math.log(Math.max(m, .02));
+    for (let k = 0; k < W * H; k++) L[k] = Math.pow(L[k], g);
+    return L;
+  }
+  function halftoneL(ctx, L, W, H, cell, ink, angle = 45, onDark = false) {
+    const a = angle * Math.PI / 180, c = Math.cos(a), s = Math.sin(a), R = Math.hypot(W, H);
+    ctx.fillStyle = ink;
+    for (let v = -R; v < R; v += cell) for (let u = -R; u < R; u += cell) {
+      const x = W/2 + u*c - v*s, y = H/2 + u*s + v*c; if (x < 0 || y < 0 || x >= W || y >= H) continue;
+      const l = L[(y|0) * W + (x|0)], rr = Math.sqrt(onDark ? l : 1 - l) * cell * .72;
+      if (rr > .35) { ctx.beginPath(); ctx.arc(x, y, rr, 0, 6.2832); ctx.fill(); }
+    }
+  }
+  function drawPlate() {
+    return new Promise(res => {
+      const img = new Image(); img.onload = () => {
+        const W = 1080, H = 1920, t = document.createElement('canvas'); t.width = W; t.height = H;
+        const x = t.getContext('2d', { willReadFrequently: true });
+        const sc = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+        x.drawImage(img, (W - img.naturalWidth * sc) * .5, (H - img.naturalHeight * sc) * .35, img.naturalWidth * sc, img.naturalHeight * sc);
+        const L = levels(x.getImageData(0, 0, W, H).data, W, H, .42);
+        const ctx = document.getElementById('plate').getContext('2d');
+        ctx.fillStyle = '#080808'; ctx.fillRect(0, 0, W, H);
+        halftoneL(ctx, L, W, H, 5, 'rgba(255,255,255,.42)', 45, true);
+        res();
+      };
+      img.src = 'assets/bg-cage.jpg';
+    });
+  }
+
+  window.ready = Promise.all([document.fonts.ready, drawPlate()]).then(fitHook);
 </script>
 </body>
 </html>
