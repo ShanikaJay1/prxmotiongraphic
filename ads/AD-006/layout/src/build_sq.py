@@ -7,7 +7,7 @@ from build import OUT, SLIDES, IMG, TILES
 
 S = 1080
 STACKS = {
-    "cover":  [(238, "text"), (370, "lineup"), (210, ((0.5, "kbg-detail"), (0.5, "shorts-detail")))],
+    "cover":  [(200, "text"), (640, "manga")],   # hook on the page, then one manga page of all six best sellers
     "kbg":    [(480, "kbg-hero"), (200, "ht:kbg-life-sq"), (120, "text")],
     "gomu":   [(120, "text"), (680, "gomu-hero")],
     "shirt":  [(330, ((0.6, "shirt-hero"), (0.4, "shirt-close"))), (220, "ht:shirt-life-sq"), (120, "text")],

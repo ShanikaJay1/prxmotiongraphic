@@ -1,6 +1,6 @@
 # AD-006 Best Sellers Static Carousel: approved layout
 
-Brief BR-006, approved by Shan on 27 Oct 2026, then revised on 28 Oct 2026 to remove prices. This is the source for every later stage.
+Brief BR-006, approved by Shan on 27 Oct 2026. Revised on 28 Oct 2026: prices removed, then slides 1 and 8 reworked (headlines on plain paper, and a manga grid on the cover). This is the source for every later stage.
 
 - `slides/slide-1.png` to `slide-8.png`: the approved finished slides, 1080 × 1080.
 - `slides/slide-*.html`: their sources. Open one in Chromium and it renders the same as the PNG, pixel for pixel. Rendering waits on `document.body.dataset.ready === '1'`.
@@ -17,14 +17,14 @@ Brief BR-006, approved by Shan on 27 Oct 2026, then revised on 28 Oct 2026 to re
 
 | # | Ground | Content |
 |---|---|---|
-| 1 | paper | Hook "THE GEAR PEOPLE KEEP COMING BACK FOR." over a line-up of all six flat lays, with wrap and shorts detail panels |
+| 1 | paper | Hook "THE GEAR PEOPLE KEEP COMING BACK FOR." straight on the page, above a manga page of all six best sellers: the Kamogawa and Gomu wraps in two big panels, then the Shirt, Shorts, Straps and Pump Cover in a row of four, all with slanted gutters |
 | 2 | ink | Kamogawa Boxing Gym Hand Wraps, RokiRed halftone strip of a wrapped fist |
 | 3 | studio grey | Gomu Hand Wraps |
 | 4 | paper | Kamogawa Boxing Gym Training Shirt: chest print and sleeve tag, RokiRed halftone of the KBG back print |
 | 5 | ink | Ippo Fight Shorts: front and back |
 | 6 | studio grey | The Fruit Lifting Straps, RokiRed halftone of a strap grip |
 | 7 | paper | Muki Muki Pump Cover: back print, RokiRed halftone of the print on a model |
-| 8 | ink | End card: six product tiles, "FIND YOURS.", SHOP NOW, rokiovertime.com |
+| 8 | ink | End card: six product tiles, then "FIND YOURS.", SHOP NOW and rokiovertime.com on plain white paper |
 
 ## Overrides and open items (Shan's instructions, this ad only)
 

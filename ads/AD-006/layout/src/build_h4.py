@@ -20,6 +20,13 @@ FLOW_CSS = """
 .chip.pname{font:700 36px/1 var(--font-display);color:var(--RokiRed);padding:12px 16px 8px}
 .cap{bottom:-30px;left:30px}
 .pn>img.ht{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pn.text.plain{background:var(--paper)}
+.cell.bare::after{display:none}
+.cell.bare>.pn.text.plain{background:transparent;padding:0}
+.mp{position:absolute}
+.mp>img.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:contrast(1.08) brightness(.96) saturate(.95)}
+.mp .tone{position:absolute;inset:0;background:radial-gradient(circle,rgba(8,8,8,.55) 32%,transparent 36%) 0 0/5px 5px;mix-blend-mode:multiply;opacity:.16}
+.mstroke{position:absolute;left:0;top:0;color:var(--panel);overflow:visible;z-index:3}
 """
 
 FIT = """<script>
@@ -44,8 +51,43 @@ def copy_html(kind, wide):
     return f'<div class="{"inline" if wide else "stackcopy"}">{name}{line}</div>'
 
 
+# Cover manga page: the two top sellers get the big panels, the other four share the row below.
+# Local coords in a 960 x 610 cell; neighbouring edges are offset by the 24 px gutter so slanted gutters stay even.
+MANGA = [
+    ("kbg-hero",    [(0, 0), (540, 0), (510, 290), (0, 290)]),
+    ("gomu-hero",   [(564, 0), (960, 0), (960, 290), (534, 290)]),
+    ("shirt-hero",  [(0, 314), (222, 314), (234, 610), (0, 610)]),
+    ("shorts-hero", [(246, 314), (468, 314), (456, 610), (258, 610)]),
+    ("straps-hero", [(492, 314), (714, 314), (726, 610), (480, 610)]),
+    ("muki-hero",   [(738, 314), (960, 314), (960, 610), (750, 610)]),
+]
+
+
+def manga_html(w, h):
+    sx, sy = w / 960, h / 610
+    panels, strokes = "", ""
+    for key, pts in MANGA:
+        pts = [(round(x * sx), round(y * sy)) for x, y in pts]
+        # each photo fills its own panel's bounding box, then the slant is clipped from that box
+        bx, by = min(x for x, _ in pts), min(y for _, y in pts)
+        bw, bh = max(x for x, _ in pts) - bx, max(y for _, y in pts) - by
+        clip = ",".join(f"{x - bx}px {y - by}px" for x, y in pts)
+        panels += (f'<div class="mp" style="left:{bx}px;top:{by}px;width:{bw}px;height:{bh}px;'
+                   f'clip-path:polygon({clip})">{photo(key)}</div>')
+        strokes += f'<polygon points="{" ".join(f"{x},{y}" for x, y in pts)}"/>'
+    svg = (f'<svg class="mstroke" width="{w}" height="{h}"><g fill="none" stroke="currentColor" stroke-width="8" '
+           f'stroke-linejoin="miter" filter="url(#roughf)">{strokes}</g></svg>')
+    return panels + svg
+
+
 def cell_html(kind, c, w, h, first_hero):
     style = f"width:{w}px;height:{h}px"
+    if c == "text" and kind == "cover":   # the hook sits straight on the page: no panel, no tone behind it
+        return f'<div class="cell bare" style="width:{w}px"><div class="pn text plain">{copy_html(kind, True)}</div></div>', False
+    if c == "text" and kind == "end":     # headline on clean paper so it reads
+        return f'<div class="cell" style="width:{w}px"><div class="pn text plain">{copy_html(kind, True)}</div></div>', False
+    if c == "manga":
+        return f'<div class="cell bare" style="{style}">{manga_html(w, h)}</div>', False
     if c == "text":
         return f'<div class="cell" style="width:{w}px"><div class="pn text screentone">{copy_html(kind, w > 700)}</div></div>', False
     if c == "lineup":

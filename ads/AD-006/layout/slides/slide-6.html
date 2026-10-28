@@ -44,6 +44,13 @@ font:700 32px/1.02 var(--font-display);letter-spacing:0}
 .chip.pname{font:700 36px/1 var(--font-display);color:var(--RokiRed);padding:12px 16px 8px}
 .cap{bottom:-30px;left:30px}
 .pn>img.ht{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pn.text.plain{background:var(--paper)}
+.cell.bare::after{display:none}
+.cell.bare>.pn.text.plain{background:transparent;padding:0}
+.mp{position:absolute}
+.mp>img.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:contrast(1.08) brightness(.96) saturate(.95)}
+.mp .tone{position:absolute;inset:0;background:radial-gradient(circle,rgba(8,8,8,.55) 32%,transparent 36%) 0 0/5px 5px;mix-blend-mode:multiply;opacity:.16}
+.mstroke{position:absolute;left:0;top:0;color:var(--panel);overflow:visible;z-index:3}
 
 .stack{z-index:2}
 .pn{outline:none!important}
