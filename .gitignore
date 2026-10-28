@@ -1,3 +1,4 @@
 out/*.png
 node_modules/
 ads/AD-008/motion/out/still-*.png
+ads/AD-008/motion/out/AD-008-motion-silent.mp4
