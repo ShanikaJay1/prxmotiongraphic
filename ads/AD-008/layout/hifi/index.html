@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080">
+<title>AD-008 Hi-fi</title>
+<style>
+  @font-face{font-family:"Druk Wide";src:url("../src/ds/DrukWide-Bold.ttf") format("truetype");font-weight:700}
+  @font-face{font-family:"Anime Ace";src:url("../src/ds/AnimeAce-Bold.ttf") format("truetype");font-weight:700}
+  @font-face{font-family:Poppins;src:url("../src/ds/Poppins-Regular.woff2") format("woff2");font-weight:400}
+  @font-face{font-family:Poppins;src:url("../src/ds/Poppins-Bold.woff2") format("woff2");font-weight:700}
+  :root{
+    --RokiRed:#8a0000;--signal-red:#d52828;--ink:#080808;--paper:#ffffff;--studio-grey:#e3e6e7;--ink-muted:#5a5a5a;
+    --space-1:16px;--space-2:32px;--space-3:60px;--space-4:96px;--safe:240px;
+    --border-frame:3px;--border-panel:8px;
+    --font-display:"Druk Wide","Arial Black",sans-serif;--font-comic:"Anime Ace","Comic Sans MS",cursive;--font-body:Poppins,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#1b1b1b}
+  .frame{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--ink)}
+  .frame.light{background:var(--paper)}
+  .frame.grey{background:var(--studio-grey)}
+  .abs{position:absolute}
+  .ph{position:absolute;overflow:hidden}
+  .ph img{position:absolute;display:block;filter:contrast(1.12) brightness(.92) saturate(.9)}
+  .ph::after{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(8,8,8,.85) 30%,transparent 33%) 0 0/5px 5px;opacity:.2;mix-blend-mode:multiply;pointer-events:none}
+  .hl{font-family:var(--font-display);font-weight:700;text-transform:uppercase;white-space:nowrap;letter-spacing:-1px;line-height:.92}
+  .comic{font-family:var(--font-comic);font-weight:700}
+  .cta{font-family:var(--font-body);font-weight:700;font-size:28px;line-height:1.1;letter-spacing:0;text-transform:uppercase}
+  .cap{font-family:var(--font-body);font-weight:400;font-size:24px;line-height:1.3}
+  .wm{position:absolute;left:var(--space-3);bottom:calc(var(--safe) + var(--space-3));width:210px}
+  .ch{position:absolute;right:var(--space-3);top:calc(var(--safe) + var(--space-3));width:190px}
+  .grain{position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;opacity:.07;filter:url(#grain);background:#fff}
+  .dark .grain{mix-blend-mode:screen;opacity:.06}
+  .rough{filter:url(#rough)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix type="saturate" values="0"/></filter>
+  <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>
+</svg>
+<div id="stage"></div>
+<script>
+const DS='../src/ds/';
+const IMG={
+  'grappler-08':[1280,1600],'grappler-03':[1280,1600],'grappler-07':[1280,1600],'grappler-10':[1280,1600],
+  'kamogawa-04':[1279,1600],'dragon-03':[1281,1600],'sendo-04':[1280,1600],'gomu-onbody':[1333,2000]
+};
+// focus per photo: fx, fy, zoom (zoom crops faces out per the design system: athlete stays anonymous)
+const FOC={
+  'grappler-08':[.5,.45,1.05],'grappler-07':[.45,.6,1.1],
+  'kamogawa-04':[.71,.85,1.35],'grappler-03':[.55,.4,1.1],'dragon-03':[.45,.6,1.1],
+  'sendo-04':[.6,.6,1.1],'gomu-onbody':[.5,.6,2.4]
+};
+const TGT={'grappler-08':[.36,.5],'grappler-07':[.5,.6],'kamogawa-04':[.6,.55],'grappler-03':[.55,.42],'dragon-03':[.4,.55],'sendo-04':[.58,.55],'gomu-onbody':[.5,.48]};
+function geom(src,w,h,o={}){const [iw,ih]=IMG[src];const f=FOC[src]||[.5,.5,1];const fx=o.fx??f[0],fy=o.fy??f[1],z=o.zoom??f[2];
+  const s=Math.max(w/iw,h/ih)*z,dw=iw*s,dh=ih*s,l=(w-dw)*fx,t=(h-dh)*fy,[tx,ty]=TGT[src]||[.5,.5];return {dw,dh,l,t,cx:l+tx*dw,cy:t+ty*dh};}
+const ROSTER=[
+  {n:'KAMOGAWA',img:'kamogawa-04'},{n:'THE GRAPPLER',img:'grappler-03'},{n:'THE DRAGON',img:'dragon-03'},
+  {n:'SENDO',img:'sendo-04'},{n:'GOMU',img:'gomu-onbody'}
+];
+const HOOK='grappler-08', CLOSE='grappler-07';
+
+function ph(src,x,y,w,h,o={}){
+  const [iw,ih]=IMG[src];const f=FOC[src]||[.5,.5,1];
+  const fx=o.fx??f[0],fy=o.fy??f[1],z=o.zoom??f[2];
+  const s=Math.max(w/iw,h/ih)*(o.center?Math.max(z,1.3):z),dw=iw*s,dh=ih*s;
+  let l=(w-dw)*fx,t=(h-dh)*fy;
+  // center: keep the wrap in the middle of a strip or thumb, but never crop above the photo's own face-safe line
+  if(o.center){const [tx,ty]=TGT[src]||[.5,.5];l=Math.min(0,Math.max(w-dw,w/2-tx*dw));const tMin=(1920-ih*Math.max(1080/iw,1920/ih)*z)*fy/(ih*Math.max(1080/iw,1920/ih)*z)*dh;t=Math.min(tMin,Math.max(h-dh,h/2-ty*dh));}
+  return `<div class="ph" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;${o.style||''}"><img src="${DS}${src}.jpg" style="width:${dw}px;height:${dh}px;left:${l}px;top:${t}px"></div>`;
+}
+// ink = wordmark ink; chInk = 頂点へ ink when its corner sits on a different ground (white on dark photography)
+const logos=(ink,chInk=ink)=>`<img class="wm" src="${DS}roki-wordmark-${ink}.png" alt="ロキ roki"><img class="ch" src="${DS}choten-block-${chInk}.png" alt="頂点へ">`;
+const frame=(cls,inner,ink,chInk)=>`<div class="frame ${cls}">${inner}${logos(ink,chInk)}<div class="grain"></div></div>`;
+// Headline fitted by measurement after fonts load (data-fit = max width, data-max = max size)
+const H=(txt,x,y,color,max,maxW,extra='')=>`<div class="hl abs rough" data-fit="${maxW}" data-max="${max}" style="left:${x}px;top:${y}px;color:${color};font-size:${max}px;${extra}">${txt}</div>`;
+
+const SAFE_T=240, SAFE_B=1680, M=60;
+
+// ---------- V1 Ink HUD: full-bleed photo, paper name tag, selector thumbs on an ink rail ----------
+function v1(b,ri){
+  const sel=(act,y)=>`<div class="abs" style="left:0;top:${y-24}px;width:1080px;height:${132+48}px;background:var(--ink)"></div>`+ROSTER.map((r,i)=>{
+      const x=M+i*(168+30);const on=i===act;
+      return ph(r.img,x,y,168,132,{center:1,style:`outline:${on?'8px solid var(--signal-red)':'3px solid var(--paper)'};outline-offset:${on?0:-3}px;${on?'':'opacity:.55'}`});
+    }).join('');
+  if(b===0) return frame('dark',ph(HOOK,0,0,1080,1920)+`<div class="abs" style="left:0;top:${SAFE_T}px;width:1080px;height:470px;background:var(--ink)"></div>`+H('FIVE WRAPS.<br>PICK YOUR<br><span style="color:var(--signal-red)">FIGHTER.</span>',M,SAFE_T+M+40,'var(--paper)',88,860),'white');
+  if(b===1){const r=ROSTER[ri];return frame('dark',ph(r.img,0,0,1080,1920)+`<div class="abs" style="left:${M}px;top:1180px;background:var(--paper);padding:20px 26px 14px">${H(r.n,0,0,'var(--ink)',76,820,'position:relative')}</div>`+sel(ri,1340),'white');}
+  if(b===2) return frame('dark',ROSTER.map((r,i)=>ph(r.img,M+i*(180+12),SAFE_T+M+110,180,820,{center:1,style:'border:3px solid var(--paper)'})).join('')+H('THE FULL<br>ROSTER',M,1290,'var(--paper)',88,900),'white');
+  return frame('dark',ph(CLOSE,0,0,1080,1920)+`<div class="abs" style="left:0;top:1140px;width:1080px;height:400px;background:var(--ink)"></div>`+`<div class="cta abs" style="left:${M}px;top:1200px;color:var(--paper);font-size:56px">SHOP NOW</div><div class="cap abs" style="left:${M}px;top:1286px;color:var(--paper);font-size:34px">rokiovertime.com</div>`,'white');
+}
+
+// ---------- V2 Paper panel: framed photo on paper, ink type, RokiRed accent ----------
+function v2(b,ri){
+  const panel=(src,o={})=>ph(src,M,SAFE_T+M+100,960,860,{...o,style:'border:var(--border-panel) solid var(--ink)'});
+  const sel=(act)=>ROSTER.map((r,i)=>ph(r.img,M+i*(176+20),1400,176,120,{center:1,style:`border:${i===act?'8px solid var(--RokiRed)':'3px solid var(--ink)'};${i===act?'':'opacity:.6'}`})).join('');
+  if(b===0) return frame('light',panel(HOOK)+H('FIVE WRAPS.<br>PICK YOUR <span style="color:var(--RokiRed)">FIGHTER.</span>',M,1340,'var(--ink)',64,960),'black');
+  if(b===1){const r=ROSTER[ri];return frame('light',panel(r.img)+H(r.n,M,1290,'var(--ink)',88,960)+sel(ri),'black');}
+  if(b===2) return frame('light',ROSTER.map((r,i)=>ph(r.img,M+i*(184+10),SAFE_T+M+100,184,960,{center:1,style:'border:var(--border-frame) solid var(--ink)'})).join('')+H('THE FULL <span style="color:var(--RokiRed)">ROSTER</span>',M,1400,'var(--ink)',64,960),'black');
+  return frame('light',panel(CLOSE)+`<div class="cta abs" style="left:${M}px;top:1320px;color:var(--RokiRed);font-size:56px">SHOP NOW</div><div class="cap abs" style="left:${M}px;top:1404px;color:var(--ink-muted);font-size:34px">rokiovertime.com</div>`,'black');
+}
+
+// ---------- V3 Manga slant: slanted panels on ink, signal-red name bar ----------
+function v3(b,ri){
+  const slant=(src,x1,y1,x2,y2,dx,o={})=>{const w=x2-x1,h=y2-y1;return ph(src,x1,y1,w,h,{...o,style:`clip-path:polygon(${dx}px 0,${w}px 0,${w-dx}px ${h}px,0 ${h}px)`})+`<svg class="abs" style="left:${x1}px;top:${y1}px" width="${w}" height="${h}"><polygon points="${dx},4 ${w-4},4 ${w-dx},${h-4} 4,${h-4}" fill="none" stroke="#fff" stroke-width="8"/></svg>`;};
+  const bar=(t,y)=>`<div class="abs" style="left:${M}px;top:${y}px;background:var(--signal-red);padding:20px 28px 14px">${H(t,0,0,'var(--paper)',72,880,'position:relative')}</div>`;
+  if(b===0) return frame('dark',slant(HOOK,M,SAFE_T+M+110,1020,1180,60)+H('FIVE WRAPS.<br>PICK YOUR FIGHTER.',M,1230,'var(--paper)',64,960),'white');
+  if(b===1){const r=ROSTER[ri];return frame('dark',slant(r.img,M,SAFE_T+M+110,1020,1260,60)+bar(r.n,1300)+ROSTER.map((q,i)=>`<div class="abs" style="left:${M+i*(180+15)}px;top:1450px;width:180px;height:16px;background:${i===ri?'var(--signal-red)':'rgba(255,255,255,.35)'};transform:skewX(-14deg)"></div>`).join(''),'white');}
+  if(b===2) return frame('dark',ROSTER.map((r,i)=>slant(r.img,M-10+i*192,SAFE_T+M+110,M-10+i*192+212,1180,24,{center:1})).join('')+bar('THE FULL ROSTER',1250),'white');
+  return frame('dark',slant(CLOSE,M,SAFE_T+M+110,1020,1180,60)+`<div class="cta abs" style="left:${M}px;top:1250px;color:var(--paper);font-size:56px;border-bottom:6px solid var(--signal-red);padding-bottom:10px">SHOP NOW</div><div class="cap abs" style="left:${M}px;top:1360px;color:var(--paper);font-size:34px">rokiovertime.com</div>`,'white');
+}
+
+// ---------- V4 Studio grey: photo top with hard cut, huge ink name, grey ground ----------
+function v4(b,ri){
+  const top=(src)=>ph(src,0,0,1080,1100);
+  if(b===0) return frame('grey',top(HOOK)+H('FIVE WRAPS.<br>PICK YOUR<br><span style="color:var(--RokiRed)">FIGHTER.</span>',M,1150,'var(--ink)',88,960),'black','white');
+  if(b===1){const r=ROSTER[ri];return frame('grey',top(r.img)+H(r.n.replace(' ','<br>'),M,1160,'var(--ink)',150,960)+ROSTER.map((q,i)=>`<div class="abs" style="left:${M+i*(180+15)}px;top:1520px;width:180px;height:10px;background:${i===ri?'var(--RokiRed)':'var(--ink)'};opacity:${i===ri?1:.25}"></div>`).join(''),'black','white');}
+  if(b===2) return frame('grey',ROSTER.map((r,i)=>ph(r.img,i*216,0,216,1100,{center:1,style:i?'border-left:6px solid var(--studio-grey)':''})).join('')+H('THE FULL<br><span style="color:var(--RokiRed)">ROSTER</span>',M,1150,'var(--ink)',150,960),'black','white');
+  return frame('grey',top(CLOSE)+`<div class="cta abs" style="left:${M}px;top:1170px;color:var(--RokiRed);font-size:56px">SHOP NOW</div><div class="cap abs" style="left:${M}px;top:1256px;color:var(--ink);font-size:34px">rokiovertime.com</div>`,'black','white');
+}
+
+// ---------- V5 Cursor: full-bleed photo, signal-red select brackets, vertical roster rail ----------
+function v5(b,ri){
+  const br=(x,y,w,h,c='var(--signal-red)',t=10,L=90)=>[[0,0,'top','left'],[1,0,'top','right'],[0,1,'bottom','left'],[1,1,'bottom','right']].map(([a,bb,v,hz])=>`<div class="abs" style="${hz}:${hz==='left'?x:1080-x-w}px;${v}:${v==='top'?y:1920-y-h}px;width:${L}px;height:${L}px;border-${v}:${t}px solid ${c};border-${hz}:${t}px solid ${c}"></div>`).join('');
+  const rail=(act)=>`<div class="abs" style="right:0;top:${SAFE_T+M+120}px;width:200px;height:${5*150+20}px;background:var(--ink)"></div>`+ROSTER.map((r,i)=>ph(r.img,1080-M-130,SAFE_T+M+130+i*150,130,130,{center:1,style:`outline:${i===act?'8px solid var(--signal-red)':'3px solid var(--paper)'};outline-offset:${i===act?0:-3}px;${i===act?'':'opacity:.55'}`})).join('');
+  const brT=(src,size=560,maxY=1180)=>{const g=geom(src,1080,1920);const x=Math.min(Math.max(g.cx-size/2,M),1080-M-size-(src===HOOK||src===CLOSE?0:220));const y=Math.min(Math.max(g.cy-size/2,SAFE_T+M+90),maxY-size);return br(x,y,size,size);};
+  if(b===0) return frame('dark',ph(HOOK,0,0,1080,1920)+brT(HOOK)+`<div class="abs" style="left:0;top:1240px;width:1080px;height:300px;background:var(--ink)"></div>`+H('FIVE WRAPS.<br>PICK YOUR FIGHTER.',M,1290,'var(--paper)',64,960),'white');
+  if(b===1){const r=ROSTER[ri];return frame('dark',ph(r.img,0,0,1080,1920)+brT(r.img,520,1300)+rail(ri)+`<div class="abs" style="left:0;top:1330px;width:1080px;height:210px;background:var(--ink)"></div>`+H(r.n,M,1380,'var(--paper)',88,960),'white');}
+  if(b===2) return frame('dark',ROSTER.map((r,i)=>ph(r.img,M+i*(180+12),SAFE_T+M+130,180,860,{center:1})).join('')+br(M-16,SAFE_T+M+114,992,892)+H('THE FULL ROSTER',M,1330,'var(--paper)',64,960),'white');
+  return frame('dark',ph(CLOSE,0,0,1080,1920)+brT(CLOSE)+`<div class="abs" style="left:0;top:1240px;width:1080px;height:300px;background:var(--ink)"></div><div class="cta abs" style="left:${M}px;top:1300px;color:var(--paper);font-size:56px">SHOP NOW</div><div class="cap abs" style="left:${M}px;top:1386px;color:var(--paper);font-size:34px">rokiovertime.com</div>`,'white');
+}
+
+const V={1:v1,2:v2,3:v3,4:v4,5:v5};
+const q=new URLSearchParams(location.search);
+const v=+(q.get('v')||1), b=+(q.get('b')||0), ri=+(q.get('r')||0);
+document.getElementById('stage').innerHTML=V[v](b,ri);
+document.fonts.ready.then(()=>{
+  document.querySelectorAll('[data-fit]').forEach(el=>{
+    const maxW=+el.dataset.fit;let lo=24,hi=+el.dataset.max;
+    el.style.fontSize=hi+'px';
+    while(el.scrollWidth>maxW&&hi>lo){hi-=2;el.style.fontSize=hi+'px';}
+  });
+  document.body.dataset.ready='1';
+});
+</script>
+</body>
+</html>
