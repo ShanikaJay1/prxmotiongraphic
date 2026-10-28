@@ -32,6 +32,7 @@
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute">
+  <filter id="liftSendo" color-interpolation-filters="sRGB"><feComponentTransfer><feFuncR type="gamma" amplitude="1" exponent=".68" offset="0"/><feFuncG type="gamma" amplitude="1" exponent=".68" offset="0"/><feFuncB type="gamma" amplitude="1" exponent=".68" offset="0"/></feComponentTransfer></filter>
   <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence id="tGrain" type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix type="saturate" values="0"/></filter>
   <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="tRough" type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>
   <filter id="roughB" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="tRoughB" type="fractalNoise" baseFrequency=".03" numOctaves="3" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/></filter>
@@ -50,7 +51,9 @@ const DS='../layout/src/ds/', GR='../layout/src/grunge/';
 const M=60, PX=60, PY=400, PW=960, PH=860;
 const IMG={'grappler-08':[1280,1600],'grappler-03':[1280,1600],'grappler-07':[1280,1600],'kamogawa-04':[1279,1600],'dragon-03':[1281,1600],'sendo-04':[1280,1600],'gomu-onbody':[1333,2000]};
 const FOC={'grappler-08':[.5,.45,1.05],'grappler-07':[.45,.6,1.1],'kamogawa-04':[.71,.85,1.35],'grappler-03':[.55,.4,1.1],'dragon-03':[.45,.6,1.1],'sendo-04':[.6,.6,1.1],'gomu-onbody':[.5,.6,2.4]};
-const TGT={'grappler-08':[.36,.5],'grappler-07':[.5,.6],'kamogawa-04':[.6,.55],'grappler-03':[.55,.42],'dragon-03':[.4,.55],'sendo-04':[.58,.55],'gomu-onbody':[.5,.48]};
+const TGT={'grappler-08':[.36,.5],'grappler-07':[.5,.6],'kamogawa-04':[.6,.55],'grappler-03':[.55,.42],'dragon-03':[.4,.55],'sendo-04':[.46,.4],'gomu-onbody':[.5,.48]};
+// Per-photo grade on top of the house finish. Sendo is lifted in the shadows and mids (gamma), blacks stay deep.
+const GRADE={'sendo-04':'url(#liftSendo) contrast(1.12) brightness(.97) saturate(.95)'};
 const ROSTER=[{n:'KAMOGAWA',img:'kamogawa-04'},{n:'THE GRAPPLER',img:'grappler-03'},{n:'THE DRAGON',img:'dragon-03'},{n:'SENDO',img:'sendo-04'},{n:'GOMU',img:'gomu-onbody'}];
 const HOOK='grappler-08', CLOSE='grappler-07';
 
@@ -60,7 +63,7 @@ function ph(src,x,y,w,h,o={}){
   let l=(w-dw)*fx,t=(h-dh)*fy;
   // center: wrap in the middle, never cropping above the photo's own face-safe line
   if(o.center){const [tx,ty]=TGT[src];l=Math.min(0,Math.max(w-dw,w/2-tx*dw));const s0=Math.max(1080/iw,1920/ih)*z;const tMin=(1920-ih*s0)*fy/(ih*s0)*dh;t=Math.min(tMin,Math.max(h-dh,h/2-ty*dh));}
-  return `<div class="ph" ${o.id?`id="${o.id}"`:''} style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"><div class="in"><img src="${DS}${src}.jpg" style="width:${dw}px;height:${dh}px;left:${l}px;top:${t}px"></div></div>`;
+  return `<div class="ph" ${o.id?`id="${o.id}"`:''} style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"><div class="in"><img src="${DS}${src}.jpg" style="width:${dw}px;height:${dh}px;left:${l}px;top:${t}px;${GRADE[src]?`filter:${GRADE[src]}`:''}"></div></div>`;
 }
 const rr=(x,y,w,h,sw,id='')=>`<svg class="abs" ${id?`id="${id}"`:''} style="left:${x-12}px;top:${y-12}px;overflow:visible;z-index:5" width="${w+24}" height="${h+24}"><rect x="${12+sw/2}" y="${12+sw/2}" width="${w-sw}" height="${h-sw}" fill="none" stroke="#080808" stroke-width="${sw}" filter="url(#roughB)"/></svg>`;
 const mark=(file,id,x,y,w,h,color,extra='')=>`<div class="abs mk" id="${id}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${color};-webkit-mask-image:url(${GR}${file}.png);mask-image:url(${GR}${file}.png);z-index:8;${extra}"></div>`;

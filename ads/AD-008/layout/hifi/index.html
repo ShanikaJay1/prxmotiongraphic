@@ -37,6 +37,7 @@
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute">
+  <filter id="liftSendo" color-interpolation-filters="sRGB"><feComponentTransfer><feFuncR type="gamma" amplitude="1" exponent=".68" offset="0"/><feFuncG type="gamma" amplitude="1" exponent=".68" offset="0"/><feFuncB type="gamma" amplitude="1" exponent=".68" offset="0"/></feComponentTransfer></filter>
   <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix type="saturate" values="0"/></filter>
   <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>
   <filter id="roughB" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="3" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/></filter>
@@ -54,9 +55,11 @@ const FOC={
   'kamogawa-04':[.71,.85,1.35],'grappler-03':[.55,.4,1.1],'dragon-03':[.45,.6,1.1],
   'sendo-04':[.6,.6,1.1],'gomu-onbody':[.5,.6,2.4]
 };
-const TGT={'grappler-08':[.36,.5],'grappler-07':[.5,.6],'kamogawa-04':[.6,.55],'grappler-03':[.55,.42],'dragon-03':[.4,.55],'sendo-04':[.58,.55],'gomu-onbody':[.5,.48]};
+const TGT={'grappler-08':[.36,.5],'grappler-07':[.5,.6],'kamogawa-04':[.6,.55],'grappler-03':[.55,.42],'dragon-03':[.4,.55],'sendo-04':[.46,.4],'gomu-onbody':[.5,.48]};
 function geom(src,w,h,o={}){const [iw,ih]=IMG[src];const f=FOC[src]||[.5,.5,1];const fx=o.fx??f[0],fy=o.fy??f[1],z=o.zoom??f[2];
   const s=Math.max(w/iw,h/ih)*z,dw=iw*s,dh=ih*s,l=(w-dw)*fx,t=(h-dh)*fy,[tx,ty]=TGT[src]||[.5,.5];return {dw,dh,l,t,cx:l+tx*dw,cy:t+ty*dh};}
+// Per-photo grade on top of the house finish. Sendo is lifted in the shadows and mids (gamma), blacks stay deep.
+const GRADE={'sendo-04':'url(#liftSendo) contrast(1.12) brightness(.97) saturate(.95)'};
 const ROSTER=[
   {n:'KAMOGAWA',img:'kamogawa-04'},{n:'THE GRAPPLER',img:'grappler-03'},{n:'THE DRAGON',img:'dragon-03'},
   {n:'SENDO',img:'sendo-04'},{n:'GOMU',img:'gomu-onbody'}
@@ -70,7 +73,7 @@ function ph(src,x,y,w,h,o={}){
   let l=(w-dw)*fx,t=(h-dh)*fy;
   // center: keep the wrap in the middle of a strip or thumb, but never crop above the photo's own face-safe line
   if(o.center){const [tx,ty]=TGT[src]||[.5,.5];l=Math.min(0,Math.max(w-dw,w/2-tx*dw));const tMin=(1920-ih*Math.max(1080/iw,1920/ih)*z)*fy/(ih*Math.max(1080/iw,1920/ih)*z)*dh;t=Math.min(tMin,Math.max(h-dh,h/2-ty*dh));}
-  return `<div class="ph" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;${o.style||''}"><img src="${DS}${src}.jpg" style="width:${dw}px;height:${dh}px;left:${l}px;top:${t}px"></div>`;
+  return `<div class="ph" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;${o.style||''}"><img src="${DS}${src}.jpg" style="width:${dw}px;height:${dh}px;left:${l}px;top:${t}px;${GRADE[src]?`filter:${GRADE[src]}`:''}"></div>`;
 }
 // ink = wordmark ink; chInk = 頂点へ ink when its corner sits on a different ground (white on dark photography)
 const logos=(ink,chInk=ink)=>`<img class="wm" src="${DS}roki-wordmark-${ink}.png" alt="ロキ roki"><img class="ch" src="${DS}choten-block-${chInk}.png" alt="頂点へ">`;
