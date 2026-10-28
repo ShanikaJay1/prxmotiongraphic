@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AD-008 Low-fi</title>
+<style>
+  :root{--line:#222;--box:#d9d9d9;--box2:#bdbdbd;--bg:#f4f4f2;--safe:rgba(213,40,40,.08)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);font:13px/1.35 Arial,Helvetica,sans-serif;color:#111;padding:32px}
+  h1{font-size:20px;margin-bottom:4px}
+  .sub{color:#555;margin-bottom:28px}
+  .var{margin-bottom:40px}
+  .var h2{font-size:16px;margin-bottom:2px}
+  .var p.note{color:#555;margin-bottom:12px;max-width:1180px}
+  .row{display:flex;gap:22px;flex-wrap:wrap}
+  .cell{width:270px}
+  .cap{font-size:11px;color:#444;margin-top:6px}
+  /* 1080x1920 at 1/4 scale */
+  .s{position:relative;width:270px;height:480px;background:#fff;border:2px solid var(--line);overflow:hidden}
+  .safe{position:absolute;left:0;right:0;height:60px;background:var(--safe);border:1px dashed #d52828;font-size:8px;color:#d52828;padding:2px 4px;z-index:5}
+  .safe.t{top:0}.safe.b{bottom:0}
+  .img{position:absolute;background:var(--box);border:1.5px solid #888;display:flex;align-items:center;justify-content:center;text-align:center;font-size:9px;color:#444;padding:4px}
+  .img::before,.img::after{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent calc(50% - .6px),#999 50%,transparent calc(50% + .6px)),linear-gradient(to top left,transparent calc(50% - .6px),#999 50%,transparent calc(50% + .6px));z-index:0}
+  .img span{position:relative;z-index:1;background:var(--box);padding:1px 3px}
+  .t{position:absolute;font-weight:700;color:#111;z-index:3}
+  .h{font-size:22px;line-height:.95;text-transform:uppercase}
+  .hm{font-size:16px;line-height:1;text-transform:uppercase}
+  .k{font-size:10px;font-style:italic}
+  .tag{position:absolute;border:1.5px solid #111;background:#fff;font-size:10px;font-weight:700;padding:3px 5px;z-index:3}
+  .logo{position:absolute;border:1.5px dashed #111;font-size:8px;display:flex;align-items:center;justify-content:center;z-index:4;background:rgba(255,255,255,.7)}
+  .wm{left:15px;bottom:63px;width:52px;height:20px}
+  .ch{right:15px;top:63px;width:48px;height:18px}
+  .cta{position:absolute;font-size:11px;font-weight:700;z-index:3;border-bottom:1.5px solid #111}
+  .dots{position:absolute;display:flex;gap:4px;z-index:3}
+  .dots i{width:30px;height:30px;border:1.5px solid #111;background:#eee;font-size:7px;font-style:normal;display:flex;align-items:center;justify-content:center}
+  .dots i.on{background:#111;color:#fff}
+  .dark{background:#2a2a2a}
+  .dark .t,.dark .cta{color:#fff;border-color:#fff}
+  .legend{display:flex;gap:18px;margin-bottom:24px;font-size:11px;color:#444;flex-wrap:wrap}
+  .legend b{display:inline-block;width:14px;height:10px;vertical-align:middle;margin-right:4px}
+</style>
+</head>
+<body>
+<h1>AD-008 · Handwraps Pick Your Fighter: rough layouts</h1>
+<div class="sub">Story 1080×1920, shown at 1/4 scale. Four screens per variation, one per story beat. Grey crossed boxes = imagery. Dashed boxes = logo marks. Red bands = 240px story safe areas.</div>
+<div class="legend">
+  <span><b style="background:#d9d9d9;border:1px solid #888"></b>Photo slot</span>
+  <span><b style="border:1px dashed #111"></b>Wordmark (bottom-left) / 頂点へ (top-right)</span>
+  <span><b style="background:rgba(213,40,40,.15);border:1px dashed #d52828"></b>Safe area</span>
+</div>
+<div id="out"></div>
+
+<script>
+const W = [
+  {n:'KAMOGAWA', img:'kamogawa-boxing-gym-hand-wraps-04'},
+  {n:'THE GRAPPLER', img:'the-grappler-hand-wraps-05'},
+  {n:'THE DRAGON', img:'the-dragon-hand-wraps-03'},
+  {n:'SENDO', img:'sendo-hand-wraps-04'},
+  {n:'GOMU', img:'gomu on-body (supplied), face cropped'}
+];
+const HOOK_IMG = 'the-grappler-hand-wraps-03';
+const frame = (inner, dark) => `<div class="s${dark?' dark':''}"><div class="safe t">safe 240</div><div class="safe b">safe 240</div>${inner}<div class="logo wm">wordmark</div><div class="logo ch">頂点へ</div></div>`;
+const img = (x,y,w,h,label,extra='') => `<div class="img" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;${extra}"><span>${label}</span></div>`;
+const txt = (x,y,cls,s,extra='') => `<div class="t ${cls}" style="left:${x}px;top:${y}px;${extra}">${s}</div>`;
+const cell = (screen, cap) => `<div class="cell">${screen}<div class="cap">${cap}</div></div>`;
+const rosterCap = 'Beat 2 · Roster (2–9s): one of five panels shown; the other four follow the same frame, ~1.4s each.';
+
+const V = [
+ {name:'A · Fighter select', note:'Reads like a game\'s character-select screen. Full-bleed photo per wrap, the name in a bar, and a five-slot selector row along the bottom that lights up as the roster cycles. The line-up is five tall strips side by side.',
+  s:[
+   frame(img(0,0,270,480,'Hook photo, full bleed<br>'+HOOK_IMG)+txt(15,96,'h','FIVE WRAPS.<br>PICK YOUR<br>FIGHTER.'),true),
+   frame(img(0,0,270,480,'Wrap photo, full bleed<br>'+W[0].img)+`<div class="tag" style="left:15px;top:300px;font-size:14px">${W[0].n}</div>`+`<div class="dots" style="left:15px;top:346px"><i class="on">1</i><i>2</i><i>3</i><i>4</i><i>5</i></div>`,true),
+   frame(W.map((w,i)=>img(15+i*48,96,44,256,w.n.replace('THE ',''))).join('')+txt(15,362,'hm','THE FULL ROSTER')),
+   frame(img(0,0,270,480,'All five wraps,<br>tight crop, darkened')+`<div class="cta" style="left:15px;top:300px;font-size:16px">SHOP NOW</div>`+txt(15,328,'k','rokiovertime.com',''),true)
+  ]},
+ {name:'B · Manga page', note:'Each wrap lands as a new manga panel that overlaps the last, slightly offset, so the page builds up across the roster. The line-up is the finished page: five overlapping panels in paper frames, never a neat grid.',
+  s:[
+   frame(img(15,96,240,190,'Hook photo panel<br>'+HOOK_IMG,'transform:rotate(-2deg)')+txt(15,300,'h','FIVE WRAPS.<br>PICK YOUR<br>FIGHTER.')),
+   frame(img(25,110,180,150,'prev panel','opacity:.5;transform:rotate(-3deg)')+img(60,170,195,190,'Wrap photo panel<br>'+W[1].img,'transform:rotate(2deg)')+`<div class="tag" style="left:40px;top:345px;font-size:13px">${W[1].n}</div>`),
+   frame(img(15,96,120,120,W[0].n,'transform:rotate(-3deg)')+img(130,110,125,110,W[1].n.replace('THE ',''),'transform:rotate(2deg)')+img(30,205,120,105,W[2].n.replace('THE ',''),'transform:rotate(2deg)')+img(140,215,115,110,W[3].n,'transform:rotate(-2deg)')+img(75,300,130,80,W[4].n,'transform:rotate(1deg)')+txt(15,362,'hm','THE FULL ROSTER')),
+   frame(img(15,96,240,200,'Close panel: hands only')+`<div class="cta" style="left:15px;top:310px;font-size:16px">SHOP NOW</div>`+txt(15,338,'k','rokiovertime.com'))
+  ]},
+ {name:'C · Name slam', note:'Type-led. The wrap name is set huge, one word per line, down the left third, with the photo bleeding off the right. Each roster beat swaps the name and the photo together. The line-up stacks all five names with a small photo beside each.',
+  s:[
+   frame(img(110,0,160,480,'Hook photo<br>right bleed<br>'+HOOK_IMG)+txt(15,96,'h','FIVE<br>WRAPS.')+txt(15,170,'hm','PICK<br>YOUR<br>FIGHTER.')),
+   frame(img(120,0,150,480,'Wrap photo<br>right bleed<br>'+W[2].img)+txt(15,180,'h','THE<br>DRAGON','font-size:24px')+txt(15,96,'k','03 / 05')),
+   frame(W.map((w,i)=>img(15,96+i*52,46,46,'photo')+txt(70,110+i*52,'hm',w.n,'font-size:14px')).join('')+txt(15,362,'hm','THE FULL ROSTER')),
+   frame(img(110,0,160,480,'Close photo')+txt(15,200,'h','SHOP<br>NOW','font-size:28px')+txt(15,262,'k','rokiovertime.com'))
+  ]},
+ {name:'D · Numbered roster', note:'Each wrap is a numbered fighter card (01 to 05) in a paper frame with an ink border, sitting on ink. Cards slide in from alternating sides. The line-up fans all five cards out like a hand of cards.',
+  s:[
+   frame(img(15,96,240,200,'Hook photo<br>'+HOOK_IMG)+txt(15,310,'h','FIVE WRAPS.<br>PICK YOUR<br>FIGHTER.'),true),
+   frame(`<div style="position:absolute;left:30px;top:100px;width:210px;height:270px;background:#fff;border:2px solid #111"></div>`+img(40,110,190,190,'Wrap photo<br>'+W[3].img)+txt(42,308,'h','04','font-size:28px')+txt(95,316,'hm',W[3].n),true),
+   frame(W.map((w,i)=>`<div style="position:absolute;left:${30+i*38}px;top:${150+Math.abs(2-i)*10}px;width:90px;height:150px;background:#fff;border:2px solid #111;transform:rotate(${(i-2)*8}deg);font-size:8px;padding:3px;z-index:${i}">0${i+1}<br>${w.n}</div>`).join('')+txt(15,362,'hm','THE FULL ROSTER','color:#fff'),true),
+   frame(`<div class="cta" style="left:15px;top:220px;font-size:16px">SHOP NOW</div>`+txt(15,248,'k','rokiovertime.com'),true)
+  ]},
+ {name:'E · Split screen', note:'Hard horizontal split: photo on the top 60% and an ink band below holding the name. The split line stays fixed, so the roster becomes a rhythm of photos swapping above a steady type band. The line-up stacks five horizontal photo bands.',
+  s:[
+   frame(img(0,0,270,290,'Hook photo<br>'+HOOK_IMG)+`<div style="position:absolute;left:0;top:290px;width:270px;height:190px;background:#2a2a2a"></div>`+txt(15,300,'h','FIVE WRAPS.<br>PICK YOUR<br>FIGHTER.','color:#fff')),
+   frame(img(0,0,270,290,'Wrap photo<br>'+W[4].img)+`<div style="position:absolute;left:0;top:290px;width:270px;height:190px;background:#2a2a2a"></div>`+txt(15,305,'h','GOMU','color:#fff;font-size:30px')+txt(15,345,'k','05 / 05','color:#fff')),
+   frame(W.map((w,i)=>img(0,60+i*60,270,56,w.n)).join('')+`<div style="position:absolute;left:0;top:360px;width:270px;height:60px;background:#2a2a2a"></div>`+txt(15,378,'hm','THE FULL ROSTER','color:#fff')),
+   frame(img(0,0,270,290,'Close photo')+`<div style="position:absolute;left:0;top:290px;width:270px;height:190px;background:#2a2a2a"></div>`+`<div class="cta" style="left:15px;top:310px;color:#fff;border-color:#fff;font-size:16px">SHOP NOW</div>`+txt(15,338,'k','rokiovertime.com','color:#fff'))
+  ]}
+];
+const caps = ['Beat 1 · Hook (0–2s)', rosterCap, 'Beat 3 · Line-up (9–11s)', 'Beat 4 · Close (11–13s)'];
+document.getElementById('out').innerHTML = V.map(v=>`<section class="var"><h2>${v.name}</h2><p class="note">${v.note}</p><div class="row">${v.s.map((s,i)=>cell(s,caps[i])).join('')}</div></section>`).join('');
+</script>
+</body>
+</html>
