@@ -39,6 +39,7 @@
 <svg width="0" height="0" style="position:absolute">
   <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix type="saturate" values="0"/></filter>
   <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="roughB" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="3" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/></filter>
 </svg>
 <div id="stage"></div>
 <script>
@@ -131,7 +132,25 @@ function v5(b,ri){
   return frame('dark',ph(CLOSE,0,0,1080,1920)+brT(CLOSE)+`<div class="abs" style="left:0;top:1240px;width:1080px;height:300px;background:var(--ink)"></div><div class="cta abs" style="left:${M}px;top:1300px;color:var(--paper);font-size:56px">SHOP NOW</div><div class="cap abs" style="left:${M}px;top:1386px;color:var(--paper);font-size:34px">rokiovertime.com</div>`,'white');
 }
 
-const V={1:v1,2:v2,3:v3,4:v4,5:v5};
+
+// ---------- V6 = V2 with the paper-grunge hand-drawn layer (approved direction) ----------
+// Light paper stock only; the hand-drawn marks carry the look. Marks are animated (boil, stepped draw-on) in Motion Build.
+const GR='../src/grunge/';
+const mark=(file,x,y,w,h,color,extra='')=>`<div class="abs mk" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${color};-webkit-mask:url(${GR}${file}.png) 0 0/100% 100% no-repeat;mask:url(${GR}${file}.png) 0 0/100% 100% no-repeat;${extra}"></div>`;
+const rr=(x,y,w,h,sw,color='var(--ink)')=>`<svg class="abs" style="left:${x-12}px;top:${y-12}px;overflow:visible" width="${w+24}" height="${h+24}"><rect x="${12+sw/2}" y="${12+sw/2}" width="${w-sw}" height="${h-sw}" fill="none" stroke="${color}" stroke-width="${sw}" filter="url(#roughB)"/></svg>`;
+const paperBg=`<div class="abs" style="inset:0;background:url(${GR}paper_0.png) 0 0/100% 100%;mix-blend-mode:multiply;opacity:.4"></div>`;
+function v6(b,ri){
+  const PX=M,PY=SAFE_T+M+100,PW=960,PH=860;
+  const panel=(src)=>ph(src,PX,PY,PW,PH,{center:1})+rr(PX,PY,PW,PH,10);
+  const thumbs=(act)=>ROSTER.map((r,i)=>{const x=M+i*(176+20);return ph(r.img,x,1400,176,120,{center:1,style:i===act?'':'opacity:.55'})+rr(x,1400,176,120,i===act?6:4);}).join('')
+    +mark('circle_0',M+act*(176+20)-46,1366,268,188,'var(--RokiRed)');
+  // data-ul: brush underline in RokiRed placed under that span after the headline is fitted
+  if(b===0) return frame('light',paperBg+panel(HOOK)+H('FIVE WRAPS.<br>PICK YOUR <span data-ul="stroke_1" style="color:var(--RokiRed)">FIGHTER.</span>',M,1340,'var(--ink)',64,960),'black');
+  if(b===1){const r=ROSTER[ri];return frame('light',paperBg+panel(r.img)+H(r.n,M,1290,'var(--ink)',88,960)+thumbs(ri),'black');}
+  if(b===2) return frame('light',paperBg+ROSTER.map((r,i)=>{const x=M+i*(184+10);return ph(r.img,x,PY,184,960,{center:1})+rr(x,PY,184,960,6);}).join('')+H('THE FULL <span data-ul="stroke_2" style="color:var(--RokiRed)">ROSTER</span>',M,1400,'var(--ink)',64,960),'black');
+  return frame('light',paperBg+panel(CLOSE)+`<div class="cta abs" style="left:${M+40}px;top:1330px;color:var(--RokiRed);font-size:56px">SHOP NOW</div>`+mark('circle_1',M-14,1286,420,160,'var(--RokiRed)')+mark('arrow_1',450,1250,240,240,'var(--ink)','transform:scaleX(-1)')+`<div class="cap abs" style="left:${M}px;top:1470px;color:var(--ink-muted);font-size:34px">rokiovertime.com</div>`,'black');
+}
+const V={1:v1,2:v2,3:v3,4:v4,5:v5,6:v6};
 const q=new URLSearchParams(location.search);
 const v=+(q.get('v')||1), b=+(q.get('b')||0), ri=+(q.get('r')||0);
 document.getElementById('stage').innerHTML=V[v](b,ri);
@@ -140,6 +159,11 @@ document.fonts.ready.then(()=>{
     const maxW=+el.dataset.fit;let lo=24,hi=+el.dataset.max;
     el.style.fontSize=hi+'px';
     while(el.scrollWidth>maxW&&hi>lo){hi-=2;el.style.fontSize=hi+'px';}
+  });
+  document.querySelectorAll('[data-ul]').forEach(sp=>{
+    const r=sp.getBoundingClientRect(),st=document.querySelector('.frame').getBoundingClientRect();
+    const d=document.createElement('div');d.innerHTML=mark(sp.dataset.ul,r.left-st.left-6,r.bottom-st.top+4,r.width+12,30,'var(--RokiRed)');
+    document.querySelector('.frame').insertBefore(d.firstChild,document.querySelector('.frame .wm'));
   });
   document.body.dataset.ready='1';
 });
