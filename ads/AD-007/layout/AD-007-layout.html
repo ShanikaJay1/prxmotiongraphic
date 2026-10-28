@@ -11,66 +11,60 @@
 
   /* Roki tokens (design system tokens.css) */
   :root {
+    --RokiRed: #8a0000;
     --signal-red: #d52828;
     --ink: #080808;
     --paper: #ffffff;
+    --studio-grey: #e3e6e7;
     --ink-muted: #5a5a5a;
-    --border-frame: 3px;
     --font-display: "Druk Wide", "Arial Black", sans-serif;
     --font-comic: "Anime Ace", "Comic Sans MS", cursive;
     --font-body: Poppins, "Helvetica Neue", Arial, sans-serif;
-    --tilt: -2deg;           /* the one tilt; everything else is 0 */
   }
 
   * { box-sizing: border-box; margin: 0; }
-  body { background: var(--ink); }
-  .ad { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); }
+  body { background: var(--studio-grey); }
+  .ad { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--studio-grey); }
   .layer { position: absolute; inset: 0; }
-  canvas.layer { width: 1080px; height: 1920px; }
 
-  /* Background: Tier C halftone plate of the cage shot, paper dots on ink */
-  .bg-dim { background: var(--ink); opacity: .36; }
-  .edge { background: url("assets/grunge/edge_0.png") center / 100% 100%; opacity: .9; }
-  .scratch { background: url("assets/grunge/scratch_0.png") center / cover; filter: invert(1); mix-blend-mode: screen; opacity: .18; }
+  /* Ground: crumpled paper stock multiplied over studio-grey */
+  .paper { background: var(--studio-grey) url("assets/grunge/cool_1.jpg") center / cover; background-blend-mode: multiply; }
+  .dust { background: url("assets/grunge/dust_0.png") center / cover; opacity: .3; }
 
   /* Hook: three lines, fitted by measurement */
-  .hook { position: absolute; left: 60px; top: 336px; width: 760px; color: var(--paper); font-family: var(--font-display); font-weight: 700; line-height: .98; text-transform: uppercase; filter: url(#rough); }
+  .hook { position: absolute; left: 60px; top: 336px; color: var(--ink); font-family: var(--font-display); font-weight: 700; line-height: .98; text-transform: uppercase; filter: url(#rough); }
   .hook span { display: block; white-space: nowrap; width: max-content; }
-  .hook .hit { position: relative; z-index: 0; }
+  .hook .hit { position: relative; z-index: 0; color: var(--paper); }
   .hook .hit::before { content: ""; position: absolute; z-index: -1; left: -20px; right: -28px; top: -16px; bottom: -20px; background: var(--signal-red);
     -webkit-mask: url("assets/grunge/stroke_2.png") center / 100% 100%; mask: url("assets/grunge/stroke_2.png") center / 100% 100%; }
 
   /* Review panels: torn paper with a hard ink shadow */
   .panel { position: absolute; filter: drop-shadow(8px 8px 0 var(--ink)); }
-  .panel.tilt { transform: rotate(var(--tilt)); }
-  .quote { position: relative; background: var(--paper) url("assets/grunge/cream_0.jpg") center / cover; background-blend-mode: multiply; padding: 30px 30px 30px; color: var(--ink); }
+  .quote { position: relative; background: var(--paper) url("assets/grunge/cream_0.jpg") center / cover; background-blend-mode: multiply; padding: 30px; color: var(--ink); }
   .quote p { font: 400 28px/1.3 var(--font-body); }
   .quote .by { display: flex; align-items: center; gap: 12px; margin-top: 14px; font: 700 21px/1 var(--font-body); }
   .quote .by span { font-weight: 400; color: var(--ink-muted); }
   .stars { display: inline-flex; gap: 3px; }
   .stars svg { width: 22px; height: 22px; fill: var(--signal-red); }
 
-  .tape { position: absolute; width: 170px; height: 46px; background: url("assets/grunge/masking_0.png") center / 100% 100%; opacity: .92; }
-
   /* Rating stamp */
-  .splat { position: absolute; background: var(--signal-red); -webkit-mask: url("assets/grunge/splat_1.png") center / 100% 100%; mask: url("assets/grunge/splat_1.png") center / 100% 100%; opacity: .85; }
-  .badge { position: absolute; background: var(--signal-red); color: var(--paper); padding: 20px 22px 18px; text-align: center; transform: rotate(var(--tilt)); filter: url(#roughSoft) drop-shadow(8px 8px 0 var(--ink)); }
+  .splat { position: absolute; background: var(--signal-red); -webkit-mask: url("assets/grunge/splat_1.png") center / 100% 100%; mask: url("assets/grunge/splat_1.png") center / 100% 100%; opacity: .9; }
+  .badge { position: absolute; background: var(--signal-red); color: var(--paper); padding: 20px 22px 18px; text-align: center; transform: rotate(-2deg); filter: url(#roughSoft) drop-shadow(8px 8px 0 var(--ink)); }
   .badge b { display: block; font: 700 70px/1 var(--font-display); }
   .badge .stars svg { fill: var(--paper); width: 24px; height: 24px; }
   .badge small { display: block; margin-top: 10px; font: 700 20px/1.1 var(--font-comic); letter-spacing: .5px; }
 
-  /* Product photos: paper-framed, overlapped, offset */
-  .thumb { position: absolute; border: 6px solid var(--paper); background: var(--ink) center / cover no-repeat; filter: drop-shadow(8px 8px 0 var(--ink)); }
-  .thumb.tilt { transform: rotate(var(--tilt)); }
+  /* Product photos: paper-framed, overlapped, thrown down at different angles */
+  .thumb { position: absolute; border: 7px solid var(--paper); background: var(--ink) center / cover no-repeat; filter: drop-shadow(8px 8px 0 var(--ink)); }
 
-  .wordmark { position: absolute; left: 60px; bottom: 300px; width: 210px; }
-  .choten { position: absolute; right: 60px; top: 300px; width: 190px; }
-  .cta { position: absolute; right: 60px; bottom: 306px; text-align: right; color: var(--paper); }
-  .cta b { display: block; font: 700 34px/1 var(--font-body); letter-spacing: 1px; }
+  /* Footer row: wordmark bottom-left, 頂点へ bottom-right, CTA between */
+  .wordmark { position: absolute; left: 60px; bottom: 250px; width: 210px; }
+  .choten { position: absolute; right: 60px; bottom: 250px; width: 190px; }
+  .cta { position: absolute; left: 0; right: 0; bottom: 252px; text-align: center; color: var(--ink); }
+  .cta b { display: block; font: 700 34px/1 var(--font-body); letter-spacing: 1px; color: var(--RokiRed); }
   .cta span { display: block; margin-top: 8px; font: 400 22px/1 var(--font-body); }
 
-  .grainA { filter: url(#grain); mix-blend-mode: overlay; opacity: .22; }
-  .grainB { filter: url(#grain); mix-blend-mode: overlay; opacity: .07; }
+  .grain { filter: url(#grain); mix-blend-mode: multiply; opacity: .12; }
 </style>
 </head>
 <body>
@@ -91,65 +85,59 @@
 </svg>
 
 <div class="ad" id="ad">
-  <canvas class="layer" id="plate" width="1080" height="1920"></canvas>
-  <div class="layer bg-dim"></div>
-  <div class="layer scratch"></div>
-  <div class="layer edge"></div>
-  <div class="layer grainA"></div>
+  <div class="layer paper"></div>
+  <div class="layer dust"></div>
 
   <h1 class="hook" id="hook">
     <span>We didn't write</span>
     <span>any of this. Our</span>
     <span><b class="hit">customers</b> did.</span>
   </h1>
-  <img class="choten" src="assets/choten-block-white.png" alt="頂点へ">
 
-  <div class="panel tilt" style="left:60px;top:584px;width:520px">
+  <div class="panel" style="left:60px;top:600px;width:540px;transform:rotate(-2deg)">
     <div class="quote torn">
       <p>"great fabric, big pockets, comfortable, good design. 10/10"</p>
       <div class="by">Gabriel B. <span>Verified buyer</span> <i class="stars" data-n="5"></i></div>
     </div>
   </div>
-  <div class="tape" style="left:6px;top:556px;transform:rotate(-24deg)"></div>
 
-  <div class="panel" style="left:330px;top:800px;width:690px">
+  <div class="panel" style="left:330px;top:812px;width:690px">
     <div class="quote torn">
       <p>"Really good quality shirt, solid materials, would double up and buy another tbh, they killed it on this one"</p>
       <div class="by">Kyle <span>Verified buyer</span> <i class="stars" data-n="5"></i></div>
     </div>
   </div>
 
-  <div class="panel tilt" style="left:60px;top:1040px;width:620px">
+  <div class="panel" style="left:60px;top:1050px;width:620px;transform:rotate(-2deg)">
     <div class="quote torn">
       <p>"The shirt print and fabric is amazing, will be getting more for sure!"</p>
       <div class="by">Harrison H. <span>Verified buyer</span> <i class="stars" data-n="5"></i></div>
     </div>
   </div>
 
-  <div class="splat" style="left:700px;top:960px;width:380px;height:380px"></div>
-  <div class="badge" style="left:752px;top:1048px;width:268px">
+  <div class="splat" style="left:700px;top:970px;width:380px;height:380px"></div>
+  <div class="badge" style="left:752px;top:1058px;width:268px">
     <b>4.6</b>
     <i class="stars" data-n="5" style="margin-top:8px"></i>
     <small>FROM 93 REVIEWS</small>
   </div>
 
-  <div class="thumb tilt" style="left:60px;top:1290px;width:250px;height:250px;background-image:url(assets/thumb-pumpcover.jpg);background-position:50% 40%"></div>
-  <div class="thumb" style="left:292px;top:1316px;width:250px;height:226px;background-image:url(assets/thumb-shirt-back.jpg);background-position:50% 45%"></div>
-  <div class="thumb tilt" style="left:524px;top:1286px;width:250px;height:254px;background-image:url(assets/thumb-kwraps.jpg)"></div>
-  <div class="thumb" style="left:770px;top:1308px;width:250px;height:232px;background-image:url(assets/thumb-gwrap.jpg)"></div>
-  <div class="tape" style="left:690px;top:1272px;width:150px;height:40px;background-image:url(assets/grunge/masking_1.png);transform:rotate(-24deg)"></div>
+  <div class="thumb" style="left:52px;top:1268px;width:250px;height:262px;background-image:url(assets/thumb-pumpcover.jpg);background-position:50% 40%;transform:rotate(-6deg)"></div>
+  <div class="thumb" style="left:290px;top:1314px;width:240px;height:226px;background-image:url(assets/thumb-shirt-back.jpg);background-position:50% 45%;transform:rotate(4deg)"></div>
+  <div class="thumb" style="left:522px;top:1262px;width:250px;height:258px;background-image:url(assets/thumb-kwraps.jpg);transform:rotate(-3deg)"></div>
+  <div class="thumb" style="left:772px;top:1302px;width:248px;height:236px;background-image:url(assets/thumb-gwrap.jpg);transform:rotate(7deg)"></div>
 
-  <img class="wordmark" src="assets/roki-wordmark-white.png" alt="ロキ roki">
+  <img class="wordmark" src="assets/roki-wordmark-black.png" alt="ロキ roki">
   <div class="cta"><b>SHOP NOW</b><span>rokiovertime.com</span></div>
+  <img class="choten" src="assets/choten-block-black.png" alt="頂点へ">
 
-  <div class="layer grainB"></div>
+  <div class="layer grain"></div>
 </div>
 
 <script>
   // Seeded random so every render is identical
   function rnd(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 
-  // Stars
   const star = '<svg><use href="#star"/></svg>';
   document.querySelectorAll('.stars').forEach(s => { s.innerHTML = star.repeat(+s.dataset.n); });
 
@@ -161,51 +149,15 @@
     el.style.clipPath = `polygon(${pts.join(',')})`;
   });
 
-  // Fit the hook: three lines, widest line fills the column
+  // Fit the hook: three lines, widest line fills the column (no mark top-right now)
   function fitHook() {
-    const el = document.getElementById('hook'), maxW = 740; let lo = 30, hi = 90;
+    const el = document.getElementById('hook'), maxW = 900; let lo = 30, hi = 100;
     while (hi - lo > 1) { const m = (lo + hi) >> 1; el.style.fontSize = m + 'px';
       const wide = Math.max(...[...el.children].map(s => s.getBoundingClientRect().width)); wide <= maxW ? lo = m : hi = m; }
     el.style.fontSize = lo + 'px';
   }
 
-  // Background plate: levelled cage shot, 5 px halftone in paper on ink (Tier C)
-  function levels(d, W, H, target = 0.5) {
-    const L = new Float32Array(W * H);
-    for (let k = 0; k < W * H; k++) L[k] = (.299 * d[k*4] + .587 * d[k*4+1] + .114 * d[k*4+2]) / 255;
-    const s = Float32Array.from(L).sort(), a = s[(W*H*.02)|0], b = s[(W*H*.98)|0]; let m = 0;
-    for (let k = 0; k < W * H; k++) { L[k] = Math.min(1, Math.max(0, (L[k] - a) / (b - a + 1e-6))); m += L[k]; }
-    m /= W * H; const g = Math.log(target) / Math.log(Math.max(m, .02));
-    for (let k = 0; k < W * H; k++) L[k] = Math.pow(L[k], g);
-    return L;
-  }
-  function halftoneL(ctx, L, W, H, cell, ink, angle = 45, onDark = false) {
-    const a = angle * Math.PI / 180, c = Math.cos(a), s = Math.sin(a), R = Math.hypot(W, H);
-    ctx.fillStyle = ink;
-    for (let v = -R; v < R; v += cell) for (let u = -R; u < R; u += cell) {
-      const x = W/2 + u*c - v*s, y = H/2 + u*s + v*c; if (x < 0 || y < 0 || x >= W || y >= H) continue;
-      const l = L[(y|0) * W + (x|0)], rr = Math.sqrt(onDark ? l : 1 - l) * cell * .72;
-      if (rr > .35) { ctx.beginPath(); ctx.arc(x, y, rr, 0, 6.2832); ctx.fill(); }
-    }
-  }
-  function drawPlate() {
-    return new Promise(res => {
-      const img = new Image(); img.onload = () => {
-        const W = 1080, H = 1920, t = document.createElement('canvas'); t.width = W; t.height = H;
-        const x = t.getContext('2d', { willReadFrequently: true });
-        const sc = Math.max(W / img.naturalWidth, H / img.naturalHeight);
-        x.drawImage(img, (W - img.naturalWidth * sc) * .5, (H - img.naturalHeight * sc) * .35, img.naturalWidth * sc, img.naturalHeight * sc);
-        const L = levels(x.getImageData(0, 0, W, H).data, W, H, .42);
-        const ctx = document.getElementById('plate').getContext('2d');
-        ctx.fillStyle = '#080808'; ctx.fillRect(0, 0, W, H);
-        halftoneL(ctx, L, W, H, 5, 'rgba(255,255,255,.42)', 45, true);
-        res();
-      };
-      img.src = 'assets/bg-cage.jpg';
-    });
-  }
-
-  window.ready = Promise.all([document.fonts.ready, drawPlate()]).then(fitHook);
+  window.ready = document.fonts.ready.then(fitHook);
 </script>
 </body>
 </html>
