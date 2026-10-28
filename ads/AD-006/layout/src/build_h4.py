@@ -15,7 +15,9 @@ FLOW_CSS = """
 .cell>.pn{position:relative;width:100%;height:100%}
 .pn.text{display:block;padding:28px 32px;height:auto!important}
 .pn.text .stackcopy{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
-.pn.text .inline{display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+.pn.text .inline{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.pn.text .inline .pname{max-width:540px}
+.chip.pname{font:700 36px/1 var(--font-display);color:var(--RokiRed);padding:12px 16px 8px}
 .cap{bottom:-30px;left:30px}
 .pn>img.ht{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 """
@@ -35,10 +37,11 @@ def copy_html(kind, wide):
         return ('<div class="end"><div class="big" style="filter:url(#rough)">FIND<br>YOURS.</div>'
                 '<div class="cta">SHOP NOW</div><div class="url">rokiovertime.com</div></div>')
     p = PRODUCTS[kind]
+    # no prices: the ad runs across currencies, so the product name takes the price's place
+    name = f'<span class="chip pname">{p["name"]}</span>'
     line = f'<span class="chip kick">{html.escape(p["line"])}</span>'
-    price = f'<span class="chip price">{p["price"]}</span>'
-    # a wide panel sets line and price on one row; a narrow one stacks them
-    return f'<div class="{"inline" if wide else "stackcopy"}">{line}{price}</div>'
+    # a wide panel sets name and line on one row; a narrow one stacks them
+    return f'<div class="{"inline" if wide else "stackcopy"}">{name}{line}</div>'
 
 
 def cell_html(kind, c, w, h, first_hero):
@@ -53,11 +56,8 @@ def cell_html(kind, c, w, h, first_hero):
         return f'<div class="cell" style="{style}"><div class="pn"><img class="ht" src="../../assets/ht/{c[3:]}.png"></div></div>', False
     if c.endswith("-strip") and kind != "shirt":
         return f'<div class="cell" style="{style}"><div class="pn speed"></div></div>', False
-    cap = ""
     is_hero = c.endswith("-hero") and first_hero and kind in PRODUCTS
-    if is_hero:
-        cap = f'<div class="cap" style="max-width:{min(w - 60, 640)}px">{PRODUCTS[kind]["name"]}</div>'
-    return f'<div class="cell" style="{style}"><div class="pn">{photo(c)}</div>{cap}</div>', is_hero
+    return f'<div class="cell" style="{style}"><div class="pn">{photo(c)}</div></div>', is_hero
 
 
 def build(kind, stack):

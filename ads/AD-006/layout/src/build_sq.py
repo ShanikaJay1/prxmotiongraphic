@@ -33,7 +33,7 @@ def lineup_sq(w, h, v):
 
 
 build_h4.lineup = lineup_sq
-RED_CSS = ".chip.price{color:var(--RokiRed)}.end .cta{color:var(--RokiRed)!important}"
+RED_CSS = ".end .cta{color:var(--RokiRed)!important}"
 
 d = OUT / "SQ"
 d.mkdir(parents=True, exist_ok=True)
