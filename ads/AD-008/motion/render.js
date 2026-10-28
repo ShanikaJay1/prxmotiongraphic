@@ -3,6 +3,7 @@
 //   draft  -> out/AD-008-draft.mp4   (540x960, 24 fps, quick)
 //   full   -> out/AD-008-motion.mp4  (1080x1920, 24 fps, crf 16, BT.709 TV range)
 //   stills -> out/still-<t>.png
+//   cues   -> ../sound/cues.json (song in-point and SFX hits, from the same timeline)
 const {chromium}=require('playwright');const http=require('http');const fs=require('fs');const path=require('path');const {spawn}=require('child_process');
 const ROOT=path.resolve(__dirname,'..');const OUT=path.join(__dirname,'out');fs.mkdirSync(OUT,{recursive:true});
 const TYPES={'.html':'text/html','.js':'text/javascript','.png':'image/png','.jpg':'image/jpeg','.ttf':'font/ttf','.woff2':'font/woff2'};
@@ -15,7 +16,8 @@ const mode=process.argv[2]||'draft';
   const pg=await b.newPage({viewport:{width:1080,height:1920}});
   await pg.goto(`http://127.0.0.1:${port}/motion/motion.html?export`);await pg.waitForFunction(()=>window.ready===true);
   const shot=async t=>{await pg.evaluate(t=>seek(t),t);await pg.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));return pg.screenshot({clip:{x:0,y:0,width:1080,height:1920},type:'png'});};
-  if(mode==='stills'){for(const t of (process.argv[3]||'0.5,1.5,3,9.5,10.5,12.5').split(',').map(Number)){fs.writeFileSync(path.join(OUT,`still-${t}.png`),await shot(t));}}
+  if(mode==='cues'){fs.writeFileSync(path.join(ROOT,'sound','cues.json'),JSON.stringify(await pg.evaluate(()=>({...window.SOUND,cues:window.CUES})),null,1));}
+  else if(mode==='stills'){for(const t of (process.argv[3]||'0.5,1.5,3,9.5,10.5,12.5').split(',').map(Number)){fs.writeFileSync(path.join(OUT,`still-${t}.png`),await shot(t));}}
   else{
     const {FPS,TOTAL}=await pg.evaluate(()=>({FPS,TOTAL}));const N=Math.round(FPS*TOTAL);
     const draft=mode==='draft';const file=path.join(OUT,draft?'AD-008-draft.mp4':'AD-008-motion-silent.mp4');

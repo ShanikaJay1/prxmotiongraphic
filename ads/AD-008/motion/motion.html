@@ -41,8 +41,11 @@
 <div id="hud"></div>
 <script>
 // ===== Timeline (seconds). Beats and durations from BR-008. 24 fps, stepped (held) motion, no blur. =====
-const FPS=24, TOTAL=13;
-const T_HOOK=0, T_ROSTER=2, SEG=1.4, T_LINEUP=9, T_CLOSE=11;
+// Re-paced to the song (Sound stage): "This What We Doin" is 160 BPM, felt half-time, so the pulse B = 0.75 s,
+// E = eighth (0.375 s), X = sixteenth. Song drop (90.055 s in the track) lands on T_ROSTER, the first roster stamp.
+const FPS=24, B=.75, E=B/2, X=E/2;
+const T_HOOK=0, T_ROSTER=3*B, SEG=2*B, T_LINEUP=T_ROSTER+5*SEG, T_CLOSE=T_LINEUP+3*B, TOTAL=T_CLOSE+3*B;
+const SONG_DROP=90.055, SONG_IN=SONG_DROP-T_ROSTER;
 const frame=t=>Math.floor(t*FPS+1e-6);
 const held=(t,n)=>Math.floor(frame(t)/n);
 
@@ -121,6 +124,16 @@ function underline(spanId,ulId){                // place a brush underline 8px u
   Object.assign(u.style,{left:(sp.left-s.left-6)+'px',top:(sp.bottom-s.top+4)+'px',width:(sp.width+12)+'px'});
 }
 
+// ===== Sound cues: every hit sits on the frame its visual lands =====
+const fr=t=>frame(t)/FPS;
+window.CUES=[
+  {t:0,s:'impact',g:.55},{t:fr(E),s:'stamp',g:.5},{t:fr(2*E),s:'stamp',g:.5},{t:fr(3*E),s:'whoosh_short',g:.4},
+  ...[0,1,2,3,4].flatMap(i=>{const t0=T_ROSTER+i*SEG;return [{t:fr(t0),s:i?'stamp':'impact',g:i?.6:.75},{t:fr(t0+3/FPS),s:'tick',g:.35}];}),
+  ...[0,1,2,3,4].map(k=>({t:fr(T_LINEUP+k*X),s:'tick',g:.4})),{t:fr(T_LINEUP+3*E),s:'stamp',g:.6},{t:fr(T_LINEUP+4*E),s:'whoosh_short',g:.4},
+  {t:fr(T_CLOSE),s:'impact',g:.6},{t:fr(T_CLOSE+E),s:'pop',g:.5},{t:fr(T_CLOSE+2*E),s:'whoosh_short',g:.35},{t:fr(T_CLOSE+3*E),s:'tick',g:.35}
+];
+window.SOUND={SONG_IN,TOTAL,FPS};
+
 // ===== seek(t): the only entry point; no clocks, no state between frames =====
 const SEEDS_R=[3,11,19], SEEDS_B=[5,13,23];
 window.seek=(t)=>{
@@ -134,9 +147,9 @@ window.seek=(t)=>{
   ['sHook','sRoster','sLine','sClose'].forEach(s=>$(s).style.visibility=s===scene?'visible':'hidden');
 
   if(scene==='sHook'){
-    stamp($('pHook'),t,0);stamp($('fHook'),t,0);push($('pHook'),t,0,2);
-    stamp($('hk1'),t,.25);stamp($('hk2'),t,.6);
-    wipe($('ulHook'),t,.95);
+    stamp($('pHook'),t,0);stamp($('fHook'),t,0);push($('pHook'),t,0,T_ROSTER);
+    stamp($('hk1'),t,E);stamp($('hk2'),t,2*E);
+    wipe($('ulHook'),t,3*E);
   }
   if(scene==='sRoster'){
     const i=Math.min(4,Math.floor((t-T_ROSTER)/SEG)),t0=T_ROSTER+i*SEG;
@@ -148,14 +161,14 @@ window.seek=(t)=>{
     const c=$('cR');c.style.left=(M+i*196-46)+'px';sweep(c,t,t0+3/FPS);
   }
   if(scene==='sLine'){
-    ROSTER.forEach((r,k)=>stamp($('ls'+k),t,T_LINEUP+k*3/FPS));
-    stamp($('hLine'),t,T_LINEUP+.6);wipe($('ulLine'),t,T_LINEUP+.95);
+    ROSTER.forEach((r,k)=>stamp($('ls'+k),t,T_LINEUP+k*X));
+    stamp($('hLine'),t,T_LINEUP+3*E);wipe($('ulLine'),t,T_LINEUP+4*E);
   }
   if(scene==='sClose'){
-    stamp($('pClose'),t,T_CLOSE);push($('pClose'),t,T_CLOSE,2,.03);
-    stamp($('shop'),t,T_CLOSE+.25);sweep($('cClose'),t,T_CLOSE+.45,6,-160);
-    wipe($('arClose'),t,T_CLOSE+.95,5,false);
-    cutIn($('url'),t,T_CLOSE+.55);
+    stamp($('pClose'),t,T_CLOSE);push($('pClose'),t,T_CLOSE,TOTAL-T_CLOSE,.03);
+    stamp($('shop'),t,T_CLOSE+E);sweep($('cClose'),t,T_CLOSE+2*E,6,-160);
+    wipe($('arClose'),t,T_CLOSE+3*E,5,false);
+    cutIn($('url'),t,T_CLOSE+2*E);
   }
   if($('hud'))$('hud').textContent=`${t.toFixed(2)}s  f${frame(t)}`;
 };
